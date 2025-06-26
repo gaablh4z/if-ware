@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Admin - IF Wave</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover { background: #0056b3; }
+        .success { color: #28a745; font-weight: bold; }
+        .error { color: #dc3545; font-weight: bold; }
+        .info { 
+            background: #e7f3ff; 
+            padding: 15px; 
+            border-radius: 8px; 
+            border-left: 4px solid #007bff;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ Criar Usuário Administrador</h1>
+        
+        <div class="info">
+            <strong>💡 Informação:</strong><br>
+            Este utilitário cria um usuário administrador para acessar o painel admin.<br>
+            O usuário criado terá privilégios de administrador no sistema.
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <button onclick="createAdmin()">➕ Criar Admin</button>
+            <button onclick="checkAdmin()">🔍 Verificar Admin</button>
+            <button onclick="openApp()">🌊 Abrir IF Wave</button>
+            <button onclick="openAdmin()">🛡️ Abrir Admin Panel</button>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const ADMIN_EMAIL = 'admin@ifmt.edu.br';
+        const ADMIN_PASSWORD = 'admin123';
+        
+        // Função de hash idêntica ao sistema
+        function hashPassword(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash).toString(16);
+        }
+        
+        function createAdmin() {
+            let users = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            
+            // Remover admin existente para evitar duplicatas
+            users = users.filter(u => u.email !== ADMIN_EMAIL);
+            
+            // Criar usuário admin
+            const admin = {
+                id: 'admin_' + Date.now(),
+                name: 'Administrador do Sistema',
+                email: ADMIN_EMAIL,
+                course: 'Administração de Sistema',
+                campus: 'IFMT - Administração',
+                passwordHash: hashPassword(ADMIN_PASSWORD),
+                role: 'admin',
+                isActive: true,
+                isVerified: true,
+                bio: 'Usuário administrador do sistema IF Wave',
+                createdAt: new Date().toISOString(),
+                lastLogin: new Date().toISOString()
+            };
+            
+            users.push(admin);
+            localStorage.setItem('ifwave_users', JSON.stringify(users));
+            
+            // Verificar se foi salvo
+            const savedUsers = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            const savedAdmin = savedUsers.find(u => u.email === ADMIN_EMAIL);
+            
+            if (savedAdmin) {
+                document.getElementById('results').innerHTML = `
+                    <div style="background: #d4edda; padding: 15px; border-radius: 8px; border-left: 4px solid #28a745;">
+                        <div class="success">✅ Usuário administrador criado com sucesso!</div>
+                        <p><strong>E-mail:</strong> ${ADMIN_EMAIL}</p>
+                        <p><strong>Senha:</strong> ${ADMIN_PASSWORD}</p>
+                        <p><strong>Perfil:</strong> Administrador</p>
+                        <p><strong>ID:</strong> ${admin.id}</p>
+                        
+                        <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border-radius: 5px; border-left: 3px solid #ffc107;">
+                            <strong>🎯 Próximos passos:</strong><br>
+                            1. Clique em "Abrir IF Wave" para fazer login<br>
+                            2. Use: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}<br>
+                            3. Após logado, clique no botão "🛡️ Admin" no cabeçalho<br>
+                            4. Ou acesse diretamente o "Admin Panel"
+                        </div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('results').innerHTML = `
+                    <div style="background: #f8d7da; padding: 15px; border-radius: 8px; border-left: 4px solid #dc3545;">
+                        <div class="error">❌ Erro: Não foi possível criar o usuário administrador!</div>
+                        <p>Tente novamente ou verifique o console para mais detalhes.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function checkAdmin() {
+            const users = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            const admin = users.find(u => u.email === ADMIN_EMAIL);
+            const currentUser = JSON.parse(localStorage.getItem('ifwave_current_user') || 'null');
+            
+            let html = '<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #6c757d;">';
+            html += '<h3>📊 Status do Administrador</h3>';
+            html += `<p><strong>Total de usuários:</strong> ${users.length}</p>`;
+            html += `<p><strong>Usuário logado:</strong> ${currentUser ? currentUser.name + ' (' + currentUser.email + ')' : 'Nenhum'}</p>`;
+            
+            if (admin) {
+                html += `<div class="success">✅ Usuário administrador existe!</div>`;
+                html += `<p><strong>Nome:</strong> ${admin.name}</p>`;
+                html += `<p><strong>E-mail:</strong> ${admin.email}</p>`;
+                html += `<p><strong>Perfil:</strong> ${admin.role}</p>`;
+                html += `<p><strong>Status:</strong> ${admin.isActive ? 'Ativo' : 'Inativo'}</p>`;
+                html += `<p><strong>Verificado:</strong> ${admin.isVerified ? 'Sim' : 'Não'}</p>`;
+                
+                if (currentUser && currentUser.email === ADMIN_EMAIL) {
+                    html += `<div style="background: #d4edda; padding: 10px; border-radius: 5px; margin-top: 10px;">`;
+                    html += `<strong>🎉 Administrador está logado!</strong><br>`;
+                    html += `Você pode acessar o painel admin agora.`;
+                    html += `</div>`;
+                } else {
+                    html += `<div style="background: #fff3cd; padding: 10px; border-radius: 5px; margin-top: 10px;">`;
+                    html += `<strong>💡 Faça login como administrador</strong><br>`;
+                    html += `Use: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`;
+                    html += `</div>`;
+                }
+            } else {
+                html += `<div class="error">❌ Usuário administrador não encontrado!</div>`;
+                html += `<p>Clique em "Criar Admin" para criar o usuário administrador.</p>`;
+            }
+            
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+        
+        function openApp() {
+            window.open('index.html', '_blank');
+        }
+        
+        function openAdmin() {
+            window.open('admin.html', '_blank');
+        }
+        
+        // Verificar automaticamente ao carregar
+        window.onload = checkAdmin;
+    </script>
+</body>
+</html>

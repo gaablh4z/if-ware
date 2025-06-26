@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IF Wave Admin</title>
+    <style>
+        :root {
+            --azul-ifmt: #003D7C;
+            --verde-energia: #2ECC71;
+            --amarelo-alegria: #F1C40F;
+            --roxo-inovador: #8E44AD;
+            --branco-puro: #FFFFFF;
+            --preto-profundo: #000000;
+
+            --background: var(--branco-puro);
+            --foreground: var(--preto-profundo);
+            --card: #fff;
+            --border: #dbdbdb;
+            --primary: var(--azul-ifmt);
+            --secondary: var(--verde-energia);
+            --accent: var(--amarelo-alegria);
+            --special: var(--roxo-inovador);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            color: var(--foreground);
+        }
+    </style>
+</head>
+<body>
+    <div id="admin-app"></div>
+
+    <script type="module">
+        import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+        
+        // Como estamos carregando via CDN, vamos usar um componente inline
+        const AdminPanelComponent = {
+            template: `
+                <div style="
+                    min-height: 100vh;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 20px;
+                ">
+                    <div style="
+                        background: white;
+                        border-radius: 12px;
+                        padding: 40px;
+                        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                        width: 100%;
+                        max-width: 400px;
+                        text-align: center;
+                    ">
+                        <h1 style="margin: 0 0 10px 0; color: #333; font-size: 2em;">
+                            🛡️ IF Wave Admin
+                        </h1>
+                        <p style="margin: 0 0 30px 0; color: #666;">
+                            Painel Administrativo
+                        </p>
+                        
+                        <div v-if="!isAuthenticated">
+                            <form @submit.prevent="handleLogin" style="text-align: left;">
+                                <div style="margin-bottom: 20px;">
+                                    <label style="
+                                        display: block;
+                                        margin-bottom: 5px;
+                                        font-weight: 600;
+                                        color: #333;
+                                    ">Usuário:</label>
+                                    <input 
+                                        v-model="loginData.username" 
+                                        type="text" 
+                                        placeholder="admin"
+                                        required
+                                        style="
+                                            width: 100%;
+                                            padding: 12px;
+                                            border: 2px solid #e1e5e9;
+                                            border-radius: 8px;
+                                            font-size: 16px;
+                                            box-sizing: border-box;
+                                        "
+                                    />
+                                </div>
+                                
+                                <div style="margin-bottom: 20px;">
+                                    <label style="
+                                        display: block;
+                                        margin-bottom: 5px;
+                                        font-weight: 600;
+                                        color: #333;
+                                    ">Senha:</label>
+                                    <input 
+                                        v-model="loginData.password" 
+                                        type="password" 
+                                        placeholder="admin123"
+                                        required
+                                        style="
+                                            width: 100%;
+                                            padding: 12px;
+                                            border: 2px solid #e1e5e9;
+                                            border-radius: 8px;
+                                            font-size: 16px;
+                                            box-sizing: border-box;
+                                        "
+                                    />
+                                </div>
+                                
+                                <button 
+                                    type="submit" 
+                                    :disabled="isLoggingIn"
+                                    style="
+                                        background: #007bff;
+                                        color: white;
+                                        width: 100%;
+                                        padding: 12px 24px;
+                                        border: none;
+                                        border-radius: 8px;
+                                        font-size: 16px;
+                                        font-weight: 600;
+                                        cursor: pointer;
+                                        transition: all 0.3s;
+                                    "
+                                >
+                                    {{ isLoggingIn ? 'Entrando...' : 'Entrar' }}
+                                </button>
+                                
+                                <div v-if="loginError" style="
+                                    padding: 12px;
+                                    border-radius: 6px;
+                                    margin-top: 15px;
+                                    background: #f8d7da;
+                                    color: #721c24;
+                                    border: 1px solid #f5c6cb;
+                                ">
+                                    {{ loginError }}
+                                </div>
+                            </form>
+                            
+                            <div style="
+                                text-align: center;
+                                margin-top: 20px;
+                                padding: 15px;
+                                background: #f8f9fa;
+                                border-radius: 8px;
+                                color: #666;
+                                font-size: 14px;
+                            ">
+                                <strong>Credenciais padrão:</strong><br>
+                                Usuário: admin<br>
+                                Senha: admin123
+                            </div>
+                        </div>
+                        
+                        <div v-else style="text-align: center;">
+                            <h2 style="color: #28a745; margin-bottom: 20px;">
+                                ✅ Login realizado com sucesso!
+                            </h2>
+                            <p style="margin-bottom: 20px; color: #666;">
+                                Bem-vindo ao painel administrativo do IF Wave.
+                            </p>
+                            <p style="margin-bottom: 30px; color: #666;">
+                                <strong>Nota:</strong> O painel admin completo com Vue.js 
+                                está em desenvolvimento. Esta é uma versão simplificada.
+                            </p>
+                            <div style="
+                                background: #e7f3ff;
+                                padding: 15px;
+                                border-radius: 8px;
+                                border-left: 4px solid #007bff;
+                                margin-bottom: 20px;
+                                text-align: left;
+                            ">
+                                <strong>🔧 Para acessar o admin completo:</strong><br>
+                                1. Integre os componentes Vue.js ao projeto<br>
+                                2. Configure o sistema de módulos<br>
+                                3. Use o AdminPanel.vue principal
+                            </div>
+                            <button 
+                                @click="logout"
+                                style="
+                                    background: #6c757d;
+                                    color: white;
+                                    padding: 10px 20px;
+                                    border: none;
+                                    border-radius: 6px;
+                                    cursor: pointer;
+                                    font-size: 14px;
+                                "
+                            >
+                                Sair
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `,
+            data() {
+                return {
+                    isAuthenticated: false,
+                    loginData: {
+                        username: '',
+                        password: ''
+                    },
+                    isLoggingIn: false,
+                    loginError: ''
+                }
+            },
+            mounted() {
+                this.checkAuth()
+            },
+            methods: {
+                checkAuth() {
+                    const session = localStorage.getItem('ifwave_admin_session')
+                    if (session) {
+                        try {
+                            const sessionData = JSON.parse(session)
+                            if (new Date() < new Date(sessionData.expires)) {
+                                this.isAuthenticated = true
+                                return
+                            }
+                        } catch (e) {
+                            // Session inválida
+                        }
+                    }
+                    this.isAuthenticated = false
+                },
+                
+                async handleLogin() {
+                    this.isLoggingIn = true
+                    this.loginError = ''
+                    
+                    try {
+                        await new Promise(resolve => setTimeout(resolve, 1000))
+                        
+                        if (this.loginData.username === 'admin' && this.loginData.password === 'admin123') {
+                            const session = {
+                                username: this.loginData.username,
+                                permissions: ['read', 'write', 'delete', 'admin'],
+                                loginTime: new Date().toISOString(),
+                                expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+                            }
+                            
+                            localStorage.setItem('ifwave_admin_session', JSON.stringify(session))
+                            this.isAuthenticated = true
+                            this.loginData = { username: '', password: '' }
+                        } else {
+                            this.loginError = 'Credenciais inválidas'
+                        }
+                    } catch (error) {
+                        this.loginError = 'Erro interno. Tente novamente.'
+                    } finally {
+                        this.isLoggingIn = false
+                    }
+                },
+                
+                logout() {
+                    localStorage.removeItem('ifwave_admin_session')
+                    this.isAuthenticated = false
+                }
+            }
+        }
+
+        createApp(AdminPanelComponent).mount('#admin-app')
+    </script>
+</body>
+</html>

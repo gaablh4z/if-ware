@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Específico - Gabriel</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover { background: #0056b3; }
+        .success { color: #28a745; font-weight: bold; }
+        .error { color: #dc3545; font-weight: bold; }
+        .warning { color: #ffc107; font-weight: bold; }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #e9ecef;
+            font-size: 12px;
+        }
+        .test-result {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Diagnóstico Específico - Gabriel</h1>
+        
+        <h2>📧 E-mail: gabriel@estudante.ifmt.edu.br</h2>
+        <h2>🔐 Senha: 5274831</h2>
+        
+        <div style="margin: 20px 0;">
+            <button onclick="checkGabriel()">🔍 Verificar Status</button>
+            <button onclick="createGabriel()">➕ Criar Usuário</button>
+            <button onclick="testLoginGabriel()">🚀 Testar Login</button>
+            <button onclick="forceLoginGabriel()">🔑 Forçar Login Gabriel</button>
+            <button onclick="clearAllData()">🗑️ Limpar Tudo</button>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const GABRIEL_EMAIL = 'gabriel@estudante.ifmt.edu.br';
+        const GABRIEL_PASSWORD = '5274831';
+        
+        // Função de hash idêntica ao sistema
+        function hashPassword(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash).toString(16);
+        }
+        
+        function checkGabriel() {
+            const users = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            const currentUser = JSON.parse(localStorage.getItem('ifwave_current_user') || 'null');
+            const gabriel = users.find(u => u.email === GABRIEL_EMAIL);
+            
+            let html = '<div class="test-result">';
+            html += '<h3>📊 Status Atual</h3>';
+            html += `<p><strong>Total de usuários cadastrados:</strong> ${users.length}</p>`;
+            html += `<p><strong>Usuário logado atualmente:</strong> ${currentUser ? currentUser.name : 'Nenhum'}</p>`;
+            
+            if (gabriel) {
+                html += `<div class="success">✅ Usuário Gabriel ENCONTRADO!</div>`;
+                html += `<p><strong>Nome:</strong> ${gabriel.name}</p>`;
+                html += `<p><strong>ID:</strong> ${gabriel.id}</p>`;
+                html += `<p><strong>Curso:</strong> ${gabriel.course}</p>`;
+                html += `<p><strong>Campus:</strong> ${gabriel.campus}</p>`;
+                html += `<p><strong>Hash da senha salva:</strong> ${gabriel.passwordHash}</p>`;
+                html += `<p><strong>Hash da senha informada:</strong> ${hashPassword(GABRIEL_PASSWORD)}</p>`;
+                html += `<p><strong>Senhas coincidem:</strong> ${gabriel.passwordHash === hashPassword(GABRIEL_PASSWORD) ? '✅ SIM' : '❌ NÃO'}</p>`;
+            } else {
+                html += `<div class="error">❌ Usuário Gabriel NÃO ENCONTRADO!</div>`;
+                html += `<p>O usuário com e-mail "${GABRIEL_EMAIL}" não existe na base de dados.</p>`;
+                html += `<p><strong>Possíveis causas:</strong></p>`;
+                html += `<ul>`;
+                html += `<li>O cadastro não foi concluído com sucesso</li>`;
+                html += `<li>Os dados foram limpos do localStorage</li>`;
+                html += `<li>Problema durante o processo de registro</li>`;
+                html += `</ul>`;
+            }
+            
+            html += '</div>';
+            
+            // Mostrar todos os usuários para debug
+            html += '<div class="test-result">';
+            html += '<h3>👥 Todos os Usuários Cadastrados</h3>';
+            if (users.length === 0) {
+                html += '<p class="warning">⚠️ Nenhum usuário cadastrado no sistema</p>';
+            } else {
+                users.forEach((user, index) => {
+                    html += `<div style="border: 1px solid #ccc; padding: 10px; margin: 5px 0; border-radius: 5px;">`;
+                    html += `<strong>${index + 1}. ${user.name}</strong><br>`;
+                    html += `E-mail: ${user.email}<br>`;
+                    html += `ID: ${user.id}<br>`;
+                    html += `Hash: ${user.passwordHash}`;
+                    html += `</div>`;
+                });
+            }
+            html += '</div>';
+            
+            document.getElementById('results').innerHTML = html;
+        }
+        
+        function createGabriel() {
+            let users = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            
+            // Remover qualquer Gabriel existente para evitar duplicatas
+            users = users.filter(u => u.email !== GABRIEL_EMAIL);
+            
+            // Criar usuário Gabriel com dados corretos
+            const gabriel = {
+                id: 'gabriel_' + Date.now(),
+                name: 'Gabriel',
+                email: GABRIEL_EMAIL,
+                course: 'Análise e Desenvolvimento de Sistemas',
+                campus: 'IFMT Campus Cuiabá',
+                passwordHash: hashPassword(GABRIEL_PASSWORD),
+                createdAt: new Date().toISOString()
+            };
+            
+            users.push(gabriel);
+            localStorage.setItem('ifwave_users', JSON.stringify(users));
+            
+            // Verificar se foi salvo corretamente
+            const savedUsers = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            const savedGabriel = savedUsers.find(u => u.email === GABRIEL_EMAIL);
+            
+            if (savedGabriel) {
+                // Logar automaticamente
+                const currentUser = {
+                    id: gabriel.id,
+                    name: gabriel.name,
+                    email: gabriel.email,
+                    course: gabriel.course,
+                    campus: gabriel.campus,
+                    loginTime: new Date().toISOString()
+                };
+                localStorage.setItem('ifwave_current_user', JSON.stringify(currentUser));
+                
+                document.getElementById('results').innerHTML = `
+                    <div class="test-result">
+                        <div class="success">✅ Usuário Gabriel criado e logado com sucesso!</div>
+                        <p><strong>E-mail:</strong> ${GABRIEL_EMAIL}</p>
+                        <p><strong>Senha:</strong> ${GABRIEL_PASSWORD}</p>
+                        <p><strong>Hash:</strong> ${gabriel.passwordHash}</p>
+                        <p><strong>ID:</strong> ${gabriel.id}</p>
+                        <p><strong>Status:</strong> Logado automaticamente</p>
+                        <div style="margin-top: 15px; padding: 10px; background: #e7f3ff; border-radius: 5px;">
+                            <strong>🎯 Agora você pode:</strong><br>
+                            1. Ir para <a href="http://localhost:8080/" target="_blank">http://localhost:8080/</a><br>
+                            2. Você já estará logado automaticamente!<br>
+                            3. Se não estiver, use: gabriel@estudante.ifmt.edu.br / 5274831
+                        </div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('results').innerHTML = `
+                    <div class="test-result">
+                        <div class="error">❌ Erro: Não foi possível salvar o usuário!</div>
+                        <p>Tente limpar os dados e criar novamente.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function testLoginGabriel() {
+            const users = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            const gabriel = users.find(u => u.email === GABRIEL_EMAIL);
+            
+            let html = '<div class="test-result">';
+            html += '<h3>🔐 Teste de Login</h3>';
+            
+            if (!gabriel) {
+                html += '<div class="error">❌ Usuário não encontrado! Crie o usuário primeiro.</div>';
+            } else {
+                const inputHash = hashPassword(GABRIEL_PASSWORD);
+                const storedHash = gabriel.passwordHash;
+                const loginSuccess = inputHash === storedHash;
+                
+                html += `<p><strong>E-mail:</strong> ${GABRIEL_EMAIL}</p>`;
+                html += `<p><strong>Senha informada:</strong> ${GABRIEL_PASSWORD}</p>`;
+                html += `<p><strong>Hash da senha informada:</strong> ${inputHash}</p>`;
+                html += `<p><strong>Hash salvo no sistema:</strong> ${storedHash}</p>`;
+                html += `<p><strong>Resultado:</strong> ${loginSuccess ? '<span class="success">✅ LOGIN SERIA BEM-SUCEDIDO</span>' : '<span class="error">❌ LOGIN FALHARIA</span>'}</p>`;
+                
+                if (loginSuccess) {
+                    // Simular login
+                    const loginData = {
+                        id: gabriel.id,
+                        name: gabriel.name,
+                        email: gabriel.email,
+                        course: gabriel.course,
+                        campus: gabriel.campus,
+                        loginTime: new Date().toISOString()
+                    };
+                    localStorage.setItem('ifwave_current_user', JSON.stringify(loginData));
+                    html += '<p class="success">✅ Usuário logado automaticamente!</p>';
+                }
+            }
+            
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+        
+        function forceLoginGabriel() {
+            const users = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            let gabriel = users.find(u => u.email === GABRIEL_EMAIL);
+            
+            // Se Gabriel não existe, criar
+            if (!gabriel) {
+                gabriel = {
+                    id: 'gabriel_' + Date.now(),
+                    name: 'Gabriel',
+                    email: GABRIEL_EMAIL,
+                    course: 'Análise e Desenvolvimento de Sistemas',
+                    campus: 'IFMT Campus Cuiabá',
+                    passwordHash: hashPassword(GABRIEL_PASSWORD),
+                    createdAt: new Date().toISOString()
+                };
+                
+                users.push(gabriel);
+                localStorage.setItem('ifwave_users', JSON.stringify(users));
+            }
+            
+            // Forçar login
+            const currentUser = {
+                id: gabriel.id,
+                name: gabriel.name,
+                email: gabriel.email,
+                course: gabriel.course,
+                campus: gabriel.campus,
+                loginTime: new Date().toISOString()
+            };
+            
+            localStorage.setItem('ifwave_current_user', JSON.stringify(currentUser));
+            
+            document.getElementById('results').innerHTML = `
+                <div class="test-result">
+                    <div class="success">✅ Gabriel logado com sucesso!</div>
+                    <p><strong>Nome:</strong> ${gabriel.name}</p>
+                    <p><strong>E-mail:</strong> ${gabriel.email}</p>
+                    <p><strong>Status:</strong> Logado</p>
+                    <div style="margin-top: 15px; padding: 10px; background: #d4edda; border-radius: 5px; border: 1px solid #c3e6cb;">
+                        <strong>🎯 Pronto!</strong><br>
+                        Agora vá para <a href="http://localhost:8080/" target="_blank" style="color: #155724; font-weight: bold;">http://localhost:8080/</a><br>
+                        Você já estará logado automaticamente!
+                    </div>
+                </div>
+            `;
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ Tem certeza que deseja limpar todos os dados?')) {
+                localStorage.removeItem('ifwave_users');
+                localStorage.removeItem('ifwave_current_user');
+                localStorage.removeItem('ifwave_conversations');
+                document.getElementById('results').innerHTML = `
+                    <div class="test-result">
+                        <div class="success">✅ Todos os dados foram limpos!</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Verificar automaticamente ao carregar
+        window.onload = checkGabriel;
+    </script>
+</body>
+</html>

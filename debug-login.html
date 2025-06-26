@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Sistema de Login/Registro</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+        button.danger {
+            background: #dc3545;
+        }
+        button.danger:hover {
+            background: #c82333;
+        }
+        button.success {
+            background: #28a745;
+        }
+        button.success:hover {
+            background: #218838;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .warning {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #e9ecef;
+            font-size: 12px;
+        }
+        .user-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .user-card h4 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+        .user-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            font-size: 14px;
+        }
+        .test-login {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .test-login input {
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        h1 {
+            color: #495057;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Debug - Sistema de Login e Registro</h1>
+    
+    <div class="container">
+        <div class="section">
+            <h2>📊 Status Geral do Sistema</h2>
+            <div id="system-status">Verificando...</div>
+            <div style="margin-top: 15px;">
+                <button onclick="checkSystemStatus()">🔄 Verificar Status</button>
+                <button onclick="clearAllData()" class="danger">🗑️ Limpar Todos os Dados</button>
+                <button onclick="createTestUsers()" class="success">👥 Criar Usuários de Teste</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>👤 Usuários Cadastrados</h2>
+            <div id="users-display">Carregando...</div>
+        </div>
+
+        <div class="section">
+            <h2>🔐 Teste de Login</h2>
+            <p>Teste o login com os usuários cadastrados:</p>
+            <div class="test-login">
+                <input type="email" id="test-email" placeholder="E-mail">
+                <input type="password" id="test-password" placeholder="Senha">
+                <button onclick="testLogin()">🚀 Testar Login</button>
+            </div>
+            <div id="login-result" style="margin-top: 10px;"></div>
+        </div>
+
+        <div class="section">
+            <h2>📱 Usuário Atual Logado</h2>
+            <div id="current-user-display">Verificando...</div>
+            <button onclick="clearCurrentUser()" class="danger">🚪 Fazer Logout</button>
+        </div>
+
+        <div class="section">
+            <h2>🗂️ Dados Brutos do localStorage</h2>
+            <button onclick="showRawData()">📋 Mostrar Dados Brutos</button>
+            <div id="raw-data-display"></div>
+        </div>
+
+        <div class="section">
+            <h2>👤 Usuário Gabriel</h2>
+            <div id="gabriel-status">Aguardando ação...</div>
+            <div style="margin-top: 15px;">
+                <button onclick="addGabrielUser()" class="success">➕ Adicionar/Atualizar Usuário Gabriel</button>
+                <button onclick="testGabrielLogin()" class="success">🚀 Testar Login do Gabriel</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>👤 Teste Específico - Gabriel</h2>
+            <p>Verificação específica para o usuário: <strong>gabriel@estudante.ifmt.edu.br</strong></p>
+            <div style="margin: 15px 0;">
+                <button onclick="addGabrielUser()" class="success">➕ Criar/Verificar Usuário Gabriel</button>
+                <button onclick="testGabrielLogin()">🔐 Testar Login do Gabriel</button>
+            </div>
+            <div id="gabriel-status"></div>
+        </div>
+    </div>
+
+    <script>
+        // Função para simular hash igual ao sistema
+        function hashPassword(password) {
+            let hash = 0
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i)
+                hash = ((hash << 5) - hash) + char
+                hash = hash & hash
+            }
+            return Math.abs(hash).toString(16)
+        }
+
+        function checkSystemStatus() {
+            const users = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            const currentUser = JSON.parse(localStorage.getItem('ifwave_current_user') || 'null');
+            const conversations = JSON.parse(localStorage.getItem('ifwave_conversations') || '[]');
+            
+            const status = document.getElementById('system-status');
+            status.innerHTML = `
+                <div class="success">✅ Sistema Funcionando</div>
+                <p><strong>📊 Usuários cadastrados:</strong> ${users.length}</p>
+                <p><strong>👤 Usuário logado:</strong> ${currentUser ? `${currentUser.name} (${currentUser.email})` : 'Nenhum'}</p>
+                <p><strong>💬 Conversas ativas:</strong> ${conversations.length}</p>
+            `;
+            
+            displayUsers();
+            displayCurrentUser();
+        }
+
+        function displayUsers() {
+            const users = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            const display = document.getElementById('users-display');
+            
+            if (users.length === 0) {
+                display.innerHTML = '<p class="warning">⚠️ Nenhum usuário cadastrado</p>';
+                return;
+            }
+
+            let html = `<p class="success">✅ ${users.length} usuários encontrados:</p>`;
+            
+            users.forEach((user, index) => {
+                html += `
+                    <div class="user-card">
+                        <h4>👤 ${user.name}</h4>
+                        <div class="user-details">
+                            <div><strong>E-mail:</strong> ${user.email}</div>
+                            <div><strong>Curso:</strong> ${user.course}</div>
+                            <div><strong>Campus:</strong> ${user.campus}</div>
+                            <div><strong>ID:</strong> ${user.id}</div>
+                            <div><strong>Hash da Senha:</strong> ${user.passwordHash}</div>
+                            <div><strong>Criado em:</strong> ${new Date(user.createdAt).toLocaleString()}</div>
+                        </div>
+                        <div class="test-login">
+                            <button onclick="fillLoginForm('${user.email}', 'senha123')" class="success">
+                                🔑 Testar Login (senha: senha123)
+                            </button>
+                            <button onclick="deleteUser('${user.id}')" class="danger">
+                                🗑️ Deletar
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            display.innerHTML = html;
+        }
+
+        function displayCurrentUser() {
+            const currentUser = JSON.parse(localStorage.getItem('ifwave_current_user') || 'null');
+            const display = document.getElementById('current-user-display');
+            
+            if (!currentUser) {
+                display.innerHTML = '<p class="warning">⚠️ Nenhum usuário logado</p>';
+                return;
+            }
+
+            display.innerHTML = `
+                <div class="user-card">
+                    <h4>👤 ${currentUser.name}</h4>
+                    <div class="user-details">
+                        <div><strong>E-mail:</strong> ${currentUser.email}</div>
+                        <div><strong>Curso:</strong> ${currentUser.course}</div>
+                        <div><strong>Campus:</strong> ${currentUser.campus}</div>
+                        <div><strong>Login em:</strong> ${new Date(currentUser.loginTime).toLocaleString()}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function fillLoginForm(email, password) {
+            document.getElementById('test-email').value = email;
+            document.getElementById('test-password').value = password;
+        }
+
+        function testLogin() {
+            const email = document.getElementById('test-email').value;
+            const password = document.getElementById('test-password').value;
+            const result = document.getElementById('login-result');
+            
+            if (!email || !password) {
+                result.innerHTML = '<p class="error">❌ Preencha e-mail e senha</p>';
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            const user = users.find(u => u.email === email);
+            
+            if (!user) {
+                result.innerHTML = '<p class="error">❌ Usuário não encontrado</p>';
+                return;
+            }
+
+            const inputHash = hashPassword(password);
+            const isPasswordCorrect = inputHash === user.passwordHash;
+            
+            result.innerHTML = `
+                <div class="${isPasswordCorrect ? 'success' : 'error'}">
+                    ${isPasswordCorrect ? '✅ Login bem-sucedido!' : '❌ Senha incorreta'}
+                </div>
+                <p><strong>Hash da senha digitada:</strong> ${inputHash}</p>
+                <p><strong>Hash salvo no sistema:</strong> ${user.passwordHash}</p>
+                <p><strong>Hashes coincidem:</strong> ${isPasswordCorrect ? 'Sim' : 'Não'}</p>
+            `;
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ Tem certeza que deseja limpar TODOS os dados?')) {
+                localStorage.removeItem('ifwave_users');
+                localStorage.removeItem('ifwave_current_user');
+                localStorage.removeItem('ifwave_conversations');
+                localStorage.removeItem('ifwave_blocked_users');
+                checkSystemStatus();
+                alert('✅ Todos os dados foram limpos!');
+            }
+        }
+
+        function clearCurrentUser() {
+            localStorage.removeItem('ifwave_current_user');
+            displayCurrentUser();
+            alert('✅ Logout realizado!');
+        }
+
+        function deleteUser(userId) {
+            if (confirm('⚠️ Tem certeza que deseja deletar este usuário?')) {
+                let users = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+                users = users.filter(u => u.id !== userId);
+                localStorage.setItem('ifwave_users', JSON.stringify(users));
+                displayUsers();
+                checkSystemStatus();
+            }
+        }
+
+        function createTestUsers() {
+            const testUsers = [
+                {
+                    id: 'test_user_1',
+                    name: 'Ana Silva',
+                    email: 'ana.silva@estudante.ifmt.edu.br',
+                    course: 'Análise e Desenvolvimento de Sistemas',
+                    campus: 'IFMT Campus Cuiabá',
+                    passwordHash: hashPassword('senha123'),
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 'test_user_2',
+                    name: 'Carlos Oliveira',
+                    email: 'carlos.oliveira@estudante.ifmt.edu.br',
+                    course: 'Engenharia de Software',
+                    campus: 'IFMT Campus Várzea Grande',
+                    passwordHash: hashPassword('senha123'),
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 'test_user_3',
+                    name: 'Maria Santos',
+                    email: 'maria.santos@estudante.ifmt.edu.br',
+                    course: 'Sistemas de Informação',
+                    campus: 'IFMT Campus Cuiabá',
+                    passwordHash: hashPassword('senha123'),
+                    createdAt: new Date().toISOString()
+                }
+            ];
+
+            localStorage.setItem('ifwave_users', JSON.stringify(testUsers));
+            checkSystemStatus();
+            alert('✅ 3 usuários de teste criados!\n\nTodos com senha: senha123');
+        }
+
+        function showRawData() {
+            const users = localStorage.getItem('ifwave_users');
+            const currentUser = localStorage.getItem('ifwave_current_user');
+            const conversations = localStorage.getItem('ifwave_conversations');
+            
+            document.getElementById('raw-data-display').innerHTML = `
+                <h3>ifwave_users:</h3>
+                <pre>${users || 'null'}</pre>
+                
+                <h3>ifwave_current_user:</h3>
+                <pre>${currentUser || 'null'}</pre>
+                
+                <h3>ifwave_conversations:</h3>
+                <pre>${conversations || 'null'}</pre>
+            `;
+        }
+
+        function addGabrielUser() {
+            const email = 'gabriel@estudante.ifmt.edu.br';
+            const password = '5274831';
+            
+            // Verificar se o usuário já existe
+            let users = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            const existingUser = users.find(u => u.email === email);
+            
+            if (existingUser) {
+                document.getElementById('gabriel-status').innerHTML = `
+                    <p class="warning">⚠️ Usuário Gabriel já existe!</p>
+                    <p><strong>Hash atual:</strong> ${existingUser.passwordHash}</p>
+                    <p><strong>Hash da senha informada:</strong> ${hashPassword(password)}</p>
+                    <p><strong>Senhas coincidem:</strong> ${existingUser.passwordHash === hashPassword(password) ? 'Sim' : 'Não'}</p>
+                `;
+                return;
+            }
+            
+            // Criar o usuário Gabriel
+            const gabrielUser = {
+                id: 'gabriel_user_' + Date.now(),
+                name: 'Gabriel',
+                email: email,
+                course: 'Análise e Desenvolvimento de Sistemas',
+                campus: 'IFMT Campus Cuiabá',
+                passwordHash: hashPassword(password),
+                createdAt: new Date().toISOString()
+            };
+            
+            users.push(gabrielUser);
+            localStorage.setItem('ifwave_users', JSON.stringify(users));
+            
+            document.getElementById('gabriel-status').innerHTML = `
+                <p class="success">✅ Usuário Gabriel criado com sucesso!</p>
+                <p><strong>E-mail:</strong> ${email}</p>
+                <p><strong>Hash da senha:</strong> ${gabrielUser.passwordHash}</p>
+            `;
+            
+            checkSystemStatus();
+        }
+
+        function testGabrielLogin() {
+            const email = 'gabriel@estudante.ifmt.edu.br';
+            const password = '5274831';
+            
+            document.getElementById('test-email').value = email;
+            document.getElementById('test-password').value = password;
+            testLogin();
+        }
+
+        // Verificar status ao carregar a página
+        window.onload = checkSystemStatus;
+    </script>
+</body>
+</html>

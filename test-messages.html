@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Sistema de Mensagens</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste do Sistema de Mensagens</h1>
+    <p>Esta página permite testar e configurar o sistema de mensagens do IF Wave.</p>
+
+    <div class="section">
+        <h2>📋 Status do LocalStorage</h2>
+        <p id="status">Verificando...</p>
+        <button onclick="checkStatus()">Verificar Status</button>
+        <button onclick="clearData()">Limpar Dados</button>
+    </div>
+
+    <div class="section">
+        <h2>👥 Usuários de Teste</h2>
+        <p>Adicionar usuários fictícios para testar o sistema de mensagens:</p>
+        <button onclick="addTestUsers()">Adicionar Usuários de Teste</button>
+        <button onclick="addCurrentUser()">Definir Usuário Atual</button>
+        <div id="users-status"></div>
+    </div>
+
+    <div class="section">
+        <h2>💬 Conversas de Teste</h2>
+        <p>Adicionar conversas fictícias para testar a interface:</p>
+        <button onclick="addTestConversations()">Adicionar Conversas de Teste</button>
+        <div id="conversations-status"></div>
+    </div>
+
+    <div class="section">
+        <h2>📊 Dados Armazenados</h2>
+        <button onclick="showData()">Mostrar Todos os Dados</button>
+        <div id="data-display"></div>
+    </div>
+
+    <script>
+        function checkStatus() {
+            const users = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            const currentUser = JSON.parse(localStorage.getItem('ifwave_current_user') || 'null');
+            const conversations = JSON.parse(localStorage.getItem('ifwave_conversations') || '[]');
+            
+            const status = document.getElementById('status');
+            status.innerHTML = `
+                <div class="success">✅ Sistema Funcionando</div>
+                <p><strong>Usuários cadastrados:</strong> ${users.length}</p>
+                <p><strong>Usuário atual:</strong> ${currentUser ? currentUser.name : 'Não definido'}</p>
+                <p><strong>Conversas ativas:</strong> ${conversations.length}</p>
+            `;
+        }
+
+        function clearData() {
+            localStorage.removeItem('ifwave_users');
+            localStorage.removeItem('ifwave_current_user');
+            localStorage.removeItem('ifwave_conversations');
+            localStorage.removeItem('ifwave_blocked_users');
+            document.getElementById('status').innerHTML = '<div class="success">✅ Dados limpos com sucesso!</div>';
+            setTimeout(checkStatus, 1000);
+        }
+
+        function addTestUsers() {
+            const testUsers = [
+                {
+                    id: 'user1',
+                    name: 'Ana Silva',
+                    email: 'ana.silva@estudante.ifmt.edu.br',
+                    course: 'Análise e Desenvolvimento de Sistemas',
+                    campus: 'IFMT Campus Cuiabá',
+                    avatar: 'https://i.pravatar.cc/150?u=ana'
+                },
+                {
+                    id: 'user2',
+                    name: 'Carlos Oliveira',
+                    email: 'carlos.oliveira@estudante.ifmt.edu.br',
+                    course: 'Engenharia de Software',
+                    campus: 'IFMT Campus Várzea Grande',
+                    avatar: 'https://i.pravatar.cc/150?u=carlos'
+                },
+                {
+                    id: 'user3',
+                    name: 'Mariana Santos',
+                    email: 'mariana.santos@estudante.ifmt.edu.br',
+                    course: 'Sistemas de Informação',
+                    campus: 'IFMT Campus Cuiabá',
+                    avatar: 'https://i.pravatar.cc/150?u=mariana'
+                },
+                {
+                    id: 'user4',
+                    name: 'Felipe Costa',
+                    email: 'felipe.costa@estudante.ifmt.edu.br',
+                    course: 'Ciência da Computação',
+                    campus: 'IFMT Campus Rondonópolis',
+                    avatar: 'https://i.pravatar.cc/150?u=felipe'
+                },
+                {
+                    id: 'user5',
+                    name: 'Juliana Rodrigues',
+                    email: 'juliana.rodrigues@estudante.ifmt.edu.br',
+                    course: 'Análise e Desenvolvimento de Sistemas',
+                    campus: 'IFMT Campus Cuiabá',
+                    avatar: 'https://i.pravatar.cc/150?u=juliana'
+                }
+            ];
+
+            localStorage.setItem('ifwave_users', JSON.stringify(testUsers));
+            document.getElementById('users-status').innerHTML = '<div class="success">✅ 5 usuários de teste adicionados!</div>';
+        }
+
+        function addCurrentUser() {
+            const currentUser = {
+                id: 'current_user',
+                name: 'Você (Usuário Teste)',
+                email: 'usuario.teste@estudante.ifmt.edu.br',
+                course: 'Análise e Desenvolvimento de Sistemas',
+                campus: 'IFMT Campus Cuiabá',
+                avatar: 'https://i.pravatar.cc/150?u=current'
+            };
+
+            localStorage.setItem('ifwave_current_user', JSON.stringify(currentUser));
+            
+            // Adicionar também à lista de usuários
+            const users = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            if (!users.find(u => u.id === currentUser.id)) {
+                users.push(currentUser);
+                localStorage.setItem('ifwave_users', JSON.stringify(users));
+            }
+
+            document.getElementById('users-status').innerHTML = '<div class="success">✅ Usuário atual definido!</div>';
+        }
+
+        function addTestConversations() {
+            const conversations = [
+                {
+                    id: 'conv1',
+                    userId: 'user1',
+                    lastMessage: 'Oi! Como vai o projeto?',
+                    lastMessageTime: '14:30',
+                    timestamp: Date.now() - 1800000, // 30 min atrás
+                    unreadCount: 2,
+                    unread: true
+                },
+                {
+                    id: 'conv2',
+                    userId: 'user2',
+                    lastMessage: 'Vamos estudar juntos para a prova?',
+                    lastMessageTime: '13:45',
+                    timestamp: Date.now() - 4500000, // 1h15 atrás
+                    unreadCount: 0,
+                    unread: false
+                },
+                {
+                    id: 'conv3',
+                    userId: 'user3',
+                    lastMessage: 'Obrigada pela ajuda com o código!',
+                    lastMessageTime: 'Ontem',
+                    timestamp: Date.now() - 86400000, // 1 dia atrás
+                    unreadCount: 0,
+                    unread: false
+                }
+            ];
+
+            localStorage.setItem('ifwave_conversations', JSON.stringify(conversations));
+            document.getElementById('conversations-status').innerHTML = '<div class="success">✅ 3 conversas de teste adicionadas!</div>';
+        }
+
+        function showData() {
+            const users = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            const currentUser = JSON.parse(localStorage.getItem('ifwave_current_user') || 'null');
+            const conversations = JSON.parse(localStorage.getItem('ifwave_conversations') || '[]');
+            
+            document.getElementById('data-display').innerHTML = `
+                <h3>Usuários:</h3>
+                <pre>${JSON.stringify(users, null, 2)}</pre>
+                
+                <h3>Usuário Atual:</h3>
+                <pre>${JSON.stringify(currentUser, null, 2)}</pre>
+                
+                <h3>Conversas:</h3>
+                <pre>${JSON.stringify(conversations, null, 2)}</pre>
+            `;
+        }
+
+        // Verificar status ao carregar a página
+        window.onload = checkStatus;
+    </script>
+</body>
+</html>

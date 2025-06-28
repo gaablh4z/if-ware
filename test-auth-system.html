@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste do Sistema de Autenticação - IF Wave</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-title {
+            color: #333;
+            border-bottom: 2px solid #0095f6;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .test-case {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background-color: #0095f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0077c2;
+        }
+        .user-list {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .user-item {
+            padding: 8px;
+            margin: 5px 0;
+            background-color: white;
+            border-radius: 3px;
+            border-left: 4px solid #0095f6;
+        }
+        .clear-btn {
+            background-color: #dc3545;
+        }
+        .clear-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 class="test-title">🧪 Teste do Sistema de Autenticação - IF Wave</h1>
+        
+        <div class="test-case">
+            <h3>📝 Teste 1: Cadastro de Usuário</h3>
+            <p>Testando o cadastro de um novo usuário com dados válidos.</p>
+            <button onclick="testRegister()">Executar Teste de Cadastro</button>
+            <div id="register-result" class="test-result" style="display: none;"></div>
+        </div>
+
+        <div class="test-case">
+            <h3>🔐 Teste 2: Login com Credenciais Válidas</h3>
+            <p>Testando login com usuário cadastrado.</p>
+            <button onclick="testLogin()">Executar Teste de Login</button>
+            <div id="login-result" class="test-result" style="display: none;"></div>
+        </div>
+
+        <div class="test-case">
+            <h3>❌ Teste 3: Login com Credenciais Inválidas</h3>
+            <p>Testando login com senha incorreta.</p>
+            <button onclick="testInvalidLogin()">Executar Teste de Login Inválido</button>
+            <div id="invalid-login-result" class="test-result" style="display: none;"></div>
+        </div>
+
+        <div class="test-case">
+            <h3>✉️ Teste 4: Validação de E-mail Institucional</h3>
+            <p>Testando a validação de e-mails institucionais.</p>
+            <button onclick="testEmailValidation()">Executar Teste de E-mail</button>
+            <div id="email-result" class="test-result" style="display: none;"></div>
+        </div>
+
+        <div class="test-case">
+            <h3>🔄 Teste 5: Persistência de Sessão</h3>
+            <p>Testando se a sessão do usuário é mantida após refresh.</p>
+            <button onclick="testSessionPersistence()">Executar Teste de Sessão</button>
+            <div id="session-result" class="test-result" style="display: none;"></div>
+        </div>
+
+        <div class="test-case">
+            <h3>🗑️ Limpar Dados de Teste</h3>
+            <p>Remove todos os usuários e dados de teste do localStorage.</p>
+            <button onclick="clearTestData()" class="clear-btn">Limpar Dados</button>
+            <div id="clear-result" class="test-result" style="display: none;"></div>
+        </div>
+
+        <div class="user-list">
+            <h3>👥 Usuários Cadastrados</h3>
+            <button onclick="showUsers()">Atualizar Lista</button>
+            <div id="users-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simulação das funções do sistema de autenticação
+        function hashPassword(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash).toString(16);
+        }
+
+        function isInstitutionalEmail(email) {
+            const institutionalDomains = [
+                '@estudante.ifmt.edu.br',
+                '@professor.ifmt.edu.br',
+                '@ifmt.edu.br'
+            ];
+            return institutionalDomains.some(domain => email.endsWith(domain));
+        }
+
+        function saveUser(userData) {
+            const users = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            const userWithHash = {
+                ...userData,
+                id: Date.now().toString(),
+                passwordHash: hashPassword(userData.password),
+                createdAt: new Date().toISOString()
+            };
+            delete userWithHash.password;
+            users.push(userWithHash);
+            localStorage.setItem('ifwave_users', JSON.stringify(users));
+            return userWithHash;
+        }
+
+        function findUserByEmail(email) {
+            const users = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            return users.find(user => user.email === email);
+        }
+
+        function verifyPassword(inputPassword, storedPasswordHash) {
+            const inputHash = hashPassword(inputPassword);
+            return inputHash === storedPasswordHash;
+        }
+
+        // Funções de teste
+        function testRegister() {
+            const resultDiv = document.getElementById('register-result');
+            resultDiv.style.display = 'block';
+            
+            try {
+                const testUser = {
+                    name: 'João da Silva',
+                    email: 'joao.silva@estudante.ifmt.edu.br',
+                    course: 'Técnico em Informática',
+                    campus: 'Cuiabá - Octayde Jorge da Silva',
+                    password: '123456'
+                };
+
+                // Verifica se o usuário já existe
+                const existingUser = findUserByEmail(testUser.email);
+                if (existingUser) {
+                    resultDiv.className = 'test-result info';
+                    resultDiv.innerHTML = '⚠️ Usuário já cadastrado. Teste com dados únicos.';
+                    return;
+                }
+
+                // Salva o usuário
+                const savedUser = saveUser(testUser);
+                
+                resultDiv.className = 'test-result success';
+                resultDiv.innerHTML = `✅ SUCESSO: Usuário cadastrado com ID ${savedUser.id}`;
+                
+            } catch (error) {
+                resultDiv.className = 'test-result error';
+                resultDiv.innerHTML = `❌ ERRO: ${error.message}`;
+            }
+        }
+
+        function testLogin() {
+            const resultDiv = document.getElementById('login-result');
+            resultDiv.style.display = 'block';
+            
+            try {
+                const loginData = {
+                    email: 'joao.silva@estudante.ifmt.edu.br',
+                    password: '123456'
+                };
+
+                // Busca o usuário
+                const user = findUserByEmail(loginData.email);
+                if (!user) {
+                    resultDiv.className = 'test-result error';
+                    resultDiv.innerHTML = '❌ ERRO: Usuário não encontrado. Execute o teste de cadastro primeiro.';
+                    return;
+                }
+
+                // Verifica a senha
+                if (!verifyPassword(loginData.password, user.passwordHash)) {
+                    resultDiv.className = 'test-result error';
+                    resultDiv.innerHTML = '❌ ERRO: Senha incorreta.';
+                    return;
+                }
+
+                // Simula login bem-sucedido
+                const sessionUser = {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    course: user.course,
+                    campus: user.campus,
+                    loginTime: new Date().toISOString()
+                };
+                localStorage.setItem('ifwave_current_user', JSON.stringify(sessionUser));
+
+                resultDiv.className = 'test-result success';
+                resultDiv.innerHTML = `✅ SUCESSO: Login realizado para ${user.name}`;
+                
+            } catch (error) {
+                resultDiv.className = 'test-result error';
+                resultDiv.innerHTML = `❌ ERRO: ${error.message}`;
+            }
+        }
+
+        function testInvalidLogin() {
+            const resultDiv = document.getElementById('invalid-login-result');
+            resultDiv.style.display = 'block';
+            
+            try {
+                const loginData = {
+                    email: 'joao.silva@estudante.ifmt.edu.br',
+                    password: 'senha_incorreta'
+                };
+
+                // Busca o usuário
+                const user = findUserByEmail(loginData.email);
+                if (!user) {
+                    resultDiv.className = 'test-result error';
+                    resultDiv.innerHTML = '❌ ERRO: Usuário não encontrado. Execute o teste de cadastro primeiro.';
+                    return;
+                }
+
+                // Verifica a senha (deve falhar)
+                if (verifyPassword(loginData.password, user.passwordHash)) {
+                    resultDiv.className = 'test-result error';
+                    resultDiv.innerHTML = '❌ ERRO INESPERADO: Login deveria ter falhado!';
+                    return;
+                }
+
+                resultDiv.className = 'test-result success';
+                resultDiv.innerHTML = '✅ SUCESSO: Login corretamente rejeitado para senha incorreta';
+                
+            } catch (error) {
+                resultDiv.className = 'test-result error';
+                resultDiv.innerHTML = `❌ ERRO: ${error.message}`;
+            }
+        }
+
+        function testEmailValidation() {
+            const resultDiv = document.getElementById('email-result');
+            resultDiv.style.display = 'block';
+            
+            const testEmails = [
+                { email: 'test@estudante.ifmt.edu.br', shouldPass: true },
+                { email: 'prof@professor.ifmt.edu.br', shouldPass: true },
+                { email: 'admin@ifmt.edu.br', shouldPass: true },
+                { email: 'user@gmail.com', shouldPass: false },
+                { email: 'invalid-email', shouldPass: false }
+            ];
+
+            let results = [];
+            let allPassed = true;
+
+            testEmails.forEach(test => {
+                const isValid = isInstitutionalEmail(test.email);
+                const passed = isValid === test.shouldPass;
+                if (!passed) allPassed = false;
+                
+                results.push(`${passed ? '✅' : '❌'} ${test.email}: ${isValid ? 'Válido' : 'Inválido'}`);
+            });
+
+            resultDiv.className = allPassed ? 'test-result success' : 'test-result error';
+            resultDiv.innerHTML = `${allPassed ? '✅ SUCESSO' : '❌ FALHA'}: Validação de e-mails<br>${results.join('<br>')}`;
+        }
+
+        function testSessionPersistence() {
+            const resultDiv = document.getElementById('session-result');
+            resultDiv.style.display = 'block';
+            
+            try {
+                const currentUser = localStorage.getItem('ifwave_current_user');
+                
+                if (!currentUser) {
+                    resultDiv.className = 'test-result info';
+                    resultDiv.innerHTML = '⚠️ Nenhuma sessão ativa. Execute o teste de login primeiro.';
+                    return;
+                }
+
+                const userData = JSON.parse(currentUser);
+                const loginTime = new Date(userData.loginTime);
+                const now = new Date();
+                const timeDiff = (now - loginTime) / 1000; // segundos
+
+                resultDiv.className = 'test-result success';
+                resultDiv.innerHTML = `✅ SUCESSO: Sessão persistente encontrada<br>
+                    👤 Usuário: ${userData.name}<br>
+                    📧 E-mail: ${userData.email}<br>
+                    ⏰ Login há: ${Math.round(timeDiff)}s`;
+                
+            } catch (error) {
+                resultDiv.className = 'test-result error';
+                resultDiv.innerHTML = `❌ ERRO: Dados de sessão corrompidos - ${error.message}`;
+            }
+        }
+
+        function clearTestData() {
+            const resultDiv = document.getElementById('clear-result');
+            resultDiv.style.display = 'block';
+            
+            try {
+                localStorage.removeItem('ifwave_users');
+                localStorage.removeItem('ifwave_current_user');
+                
+                resultDiv.className = 'test-result success';
+                resultDiv.innerHTML = '✅ SUCESSO: Todos os dados de teste foram removidos';
+                
+                // Atualiza a lista de usuários
+                showUsers();
+                
+            } catch (error) {
+                resultDiv.className = 'test-result error';
+                resultDiv.innerHTML = `❌ ERRO: ${error.message}`;
+            }
+        }
+
+        function showUsers() {
+            const usersDiv = document.getElementById('users-list');
+            const users = JSON.parse(localStorage.getItem('ifwave_users') || '[]');
+            
+            if (users.length === 0) {
+                usersDiv.innerHTML = '<p>Nenhum usuário cadastrado.</p>';
+                return;
+            }
+
+            let html = '';
+            users.forEach(user => {
+                html += `
+                    <div class="user-item">
+                        <strong>${user.name}</strong> - ${user.email}<br>
+                        <small>Curso: ${user.course} | Campus: ${user.campus}</small><br>
+                        <small>ID: ${user.id} | Criado em: ${new Date(user.createdAt).toLocaleString()}</small>
+                    </div>
+                `;
+            });
+            
+            usersDiv.innerHTML = html;
+        }
+
+        // Carrega a lista de usuários ao inicializar
+        showUsers();
+    </script>
+</body>
+</html>

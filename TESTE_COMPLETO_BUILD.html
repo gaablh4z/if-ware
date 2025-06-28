@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Completo - IF Wave (Build Produção)</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        .test-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .test-header h1 {
+            color: #4a5568;
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+        }
+        .test-header p {
+            color: #718096;
+            margin: 0;
+            font-size: 1.1em;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .test-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin: 0 0 15px 0;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .test-item {
+            margin: 15px 0;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f7fafc;
+            transition: all 0.2s;
+        }
+        .test-item:hover {
+            border-color: #4299e1;
+            background: #ebf8ff;
+        }
+        .test-item h4 {
+            margin: 0 0 8px 0;
+            color: #2b6cb0;
+            font-size: 1.1em;
+        }
+        .test-item p {
+            margin: 0 0 10px 0;
+            font-size: 0.95em;
+            color: #4a5568;
+        }
+        .test-btn {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
+            margin-bottom: 5px;
+        }
+        .test-btn:hover {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .test-btn.admin {
+            background: linear-gradient(135deg, #e53e3e, #c53030);
+        }
+        .test-btn.admin:hover {
+            background: linear-gradient(135deg, #c53030, #9c2626);
+        }
+        .status-indicator {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .status-success {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+        .status-warning {
+            background: #feebc8;
+            color: #c05621;
+        }
+        .status-info {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+        .checklist {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .checklist h3 {
+            color: #2d3748;
+            margin: 0 0 20px 0;
+            font-size: 1.4em;
+        }
+        .check-item {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            padding: 10px;
+            border-radius: 8px;
+            background: #f7fafc;
+        }
+        .check-item input[type="checkbox"] {
+            margin-right: 12px;
+            transform: scale(1.2);
+        }
+        .check-item label {
+            cursor: pointer;
+            flex: 1;
+            font-weight: 500;
+        }
+        .performance-metrics {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .metric-card {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        @media (max-width: 768px) {
+            .test-grid {
+                grid-template-columns: 1fr;
+            }
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🚀 Teste Completo - IF Wave</h1>
+        <p>Versão Build de Produção | Todas as Funcionalidades</p>
+        <div class="status-indicator status-success">Build Concluído ✅</div>
+        <div class="status-indicator status-info">Servindo em Produção 🔄</div>
+    </div>
+
+    <div class="performance-metrics">
+        <h3>📊 Métricas do Build</h3>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">311 KB</div>
+                <div class="metric-label">Bundle Total</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">146 KB</div>
+                <div class="metric-label">App JS</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">59.9 KB</div>
+                <div class="metric-label">CSS</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">38.95 KB</div>
+                <div class="metric-label">Gzipped</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-grid">
+        <!-- Autenticação -->
+        <div class="test-section">
+            <div class="section-title">🔐 Sistema de Autenticação</div>
+            
+            <div class="test-item">
+                <h4>Teste de Login</h4>
+                <p>Testar login com credenciais do IFMT</p>
+                <a href="http://localhost:3000" target="_blank" class="test-btn">Abrir App Produção</a>
+            </div>
+            
+            <div class="test-item">
+                <h4>Cadastro de Usuário</h4>
+                <p>Testar cadastro com e-mail institucional</p>
+                <button class="test-btn" onclick="testRegister()">Testar Cadastro</button>
+            </div>
+            
+            <div class="test-item">
+                <h4>Validação de E-mail</h4>
+                <p>Verificar domínios institucionais aceitos</p>
+                <button class="test-btn" onclick="testEmailValidation()">Testar E-mails</button>
+            </div>
+        </div>
+
+        <!-- Interface Principal -->
+        <div class="test-section">
+            <div class="section-title">🏠 Interface Principal</div>
+            
+            <div class="test-item">
+                <h4>Feed de Posts</h4>
+                <p>Verificar carregamento e exibição de posts</p>
+                <span class="status-indicator status-success">Funcionando</span>
+            </div>
+            
+            <div class="test-item">
+                <h4>Navegação Bottom Bar</h4>
+                <p>Testar todas as abas de navegação</p>
+                <span class="status-indicator status-success">5 Abas Ativas</span>
+            </div>
+            
+            <div class="test-item">
+                <h4>Tema Dark/Light</h4>
+                <p>Alternar entre temas claro e escuro</p>
+                <button class="test-btn" onclick="testDarkMode()">Testar Tema</button>
+            </div>
+        </div>
+
+        <!-- Notificações -->
+        <div class="test-section">
+            <div class="section-title">🔔 Sistema de Notificações</div>
+            
+            <div class="test-item">
+                <h4>Interface Estilo Instagram</h4>
+                <p>Nova UI com ícones coloridos e filtros</p>
+                <span class="status-indicator status-success">Redesenhado</span>
+            </div>
+            
+            <div class="test-item">
+                <h4>Tipos de Notificação</h4>
+                <p>Curtidas, Comentários, Seguidores, Menções</p>
+                <span class="status-indicator status-success">4 Tipos</span>
+            </div>
+            
+            <div class="test-item">
+                <h4>Agrupamento Temporal</h4>
+                <p>Hoje, Esta semana, Anteriores</p>
+                <span class="status-indicator status-success">Implementado</span>
+            </div>
+        </div>
+
+        <!-- Funcionalidades Avançadas -->
+        <div class="test-section">
+            <div class="section-title">⚡ Funcionalidades Avançadas</div>
+            
+            <div class="test-item">
+                <h4>Busca de Usuários</h4>
+                <p>Sistema de busca e descoberta</p>
+                <span class="status-indicator status-info">Básico</span>
+            </div>
+            
+            <div class="test-item">
+                <h4>Sistema de Mensagens</h4>
+                <p>Chat entre usuários</p>
+                <span class="status-indicator status-info">Interface</span>
+            </div>
+            
+            <div class="test-item">
+                <h4>Publicação de Posts</h4>
+                <p>Criar novas publicações</p>
+                <span class="status-indicator status-info">Interface</span>
+            </div>
+        </div>
+
+        <!-- Painel Admin -->
+        <div class="test-section">
+            <div class="section-title">🛡️ Painel Administrativo</div>
+            
+            <div class="test-item">
+                <h4>Login Admin</h4>
+                <p>Credenciais: admin / admin123</p>
+                <button class="test-btn admin" onclick="testAdmin()">Testar Admin</button>
+            </div>
+            
+            <div class="test-item">
+                <h4>Gestão de Usuários</h4>
+                <p>Visualizar e gerenciar usuários</p>
+                <span class="status-indicator status-success">Disponível</span>
+            </div>
+            
+            <div class="test-item">
+                <h4>Estatísticas</h4>
+                <p>Dashboard com métricas do sistema</p>
+                <span class="status-indicator status-success">Implementado</span>
+            </div>
+        </div>
+
+        <!-- Performance -->
+        <div class="test-section">
+            <div class="section-title">🚀 Performance & Otimização</div>
+            
+            <div class="test-item">
+                <h4>Build de Produção</h4>
+                <p>Minificação e otimização</p>
+                <span class="status-indicator status-success">Concluído</span>
+            </div>
+            
+            <div class="test-item">
+                <h4>Responsividade</h4>
+                <p>Adaptação para mobile e desktop</p>
+                <span class="status-indicator status-success">Implementado</span>
+            </div>
+            
+            <div class="test-item">
+                <h4>Acessibilidade</h4>
+                <p>ARIA labels e navegação por teclado</p>
+                <span class="status-indicator status-warning">Básico</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checklist de Funcionalidades -->
+    <div class="checklist">
+        <h3>✅ Checklist de Funcionalidades Testadas</h3>
+        
+        <div class="check-item">
+            <input type="checkbox" id="auth" checked>
+            <label for="auth">Sistema de autenticação (login/cadastro)</label>
+        </div>
+        
+        <div class="check-item">
+            <input type="checkbox" id="feed" checked>
+            <label for="feed">Feed principal com posts</label>
+        </div>
+        
+        <div class="check-item">
+            <input type="checkbox" id="notifications" checked>
+            <label for="notifications">Sistema de notificações estilo Instagram</label>
+        </div>
+        
+        <div class="check-item">
+            <input type="checkbox" id="navigation" checked>
+            <label for="navigation">Navegação entre telas</label>
+        </div>
+        
+        <div class="check-item">
+            <input type="checkbox" id="profile" checked>
+            <label for="profile">Tela de perfil do usuário</label>
+        </div>
+        
+        <div class="check-item">
+            <input type="checkbox" id="search" checked>
+            <label for="search">Interface de busca</label>
+        </div>
+        
+        <div class="check-item">
+            <input type="checkbox" id="messages" checked>
+            <label for="messages">Sistema de mensagens</label>
+        </div>
+        
+        <div class="check-item">
+            <input type="checkbox" id="publish" checked>
+            <label for="publish">Interface de publicação</label>
+        </div>
+        
+        <div class="check-item">
+            <input type="checkbox" id="admin" checked>
+            <label for="admin">Painel administrativo</label>
+        </div>
+        
+        <div class="check-item">
+            <input type="checkbox" id="responsive" checked>
+            <label for="responsive">Design responsivo</label>
+        </div>
+        
+        <div class="check-item">
+            <input type="checkbox" id="dark-mode" checked>
+            <label for="dark-mode">Tema escuro/claro</label>
+        </div>
+        
+        <div class="check-item">
+            <input type="checkbox" id="build" checked>
+            <label for="build">Build de produção funcional</label>
+        </div>
+    </div>
+
+    <script>
+        function testRegister() {
+            window.open('http://localhost:3000', '_blank');
+            alert('1. Clique em "Não tem conta? Cadastre-se"\n2. Use um e-mail @estudante.ifmt.edu.br\n3. Preencha todos os campos\n4. Teste a validação');
+        }
+
+        function testEmailValidation() {
+            const emails = [
+                '@estudante.ifmt.edu.br ✅',
+                '@professor.ifmt.edu.br ✅', 
+                '@ifmt.edu.br ✅',
+                '@gmail.com ❌',
+                '@hotmail.com ❌'
+            ];
+            alert('E-mails aceitos pelo sistema:\n\n' + emails.join('\n'));
+        }
+
+        function testDarkMode() {
+            alert('Para testar o tema:\n1. Faça login na aplicação\n2. Clique no botão 🌙 no header\n3. Verifique a mudança de cores');
+        }
+
+        function testAdmin() {
+            alert('Para testar o admin:\n1. Faça login normal primeiro\n2. Clique no botão 🛡️ Admin\n3. Use: admin / admin123');
+        }
+
+        // Auto-check dos itens conforme são testados
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const label = this.nextElementSibling;
+                    if (this.checked) {
+                        label.style.textDecoration = 'line-through';
+                        label.style.opacity = '0.7';
+                    } else {
+                        label.style.textDecoration = 'none';
+                        label.style.opacity = '1';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

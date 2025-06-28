@@ -48,4 +48,13 @@ Thumbs.db
 
 # Arquivos temporários
 *.tmp
+
+# Relatórios de teste específicos (manter apenas os mais importantes)
+runtime-test-report.json
+test-execution-log.json
+
+# Arquivos de teste locais
+debug-login.html
+gabriel-test.html
+test-messages.html
 *.temp

@@ -56,23 +56,73 @@
         <button class="attachment-btn" @click="showAttachmentOptions = !showAttachmentOptions">
           <IconComponent name="attach" :size="20" />
         </button>
-        <input 
-          type="text" 
-          v-model="newMessage" 
-          @keyup.enter="sendMessage"
-          @input="handleTyping"
-          placeholder="Digite uma mensagem..."
-          class="message-input"
-          maxlength="500"
-        />
-        <button 
-          class="send-btn" 
-          @click="sendMessage" 
-          :disabled="!newMessage.trim()"
-          :class="{ active: newMessage.trim() }"
-        >
-          <IconComponent name="send" :size="20" />
-        </button>
+        <div class="message-input-wrapper">
+          <input 
+            ref="messageInput"
+            type="text" 
+            v-model="newMessage" 
+            @keyup.enter="sendMessage"
+            @input="handleTyping"
+            @focus="handleInputFocus"
+            @blur="handleInputBlur"
+            placeholder="Digite uma mensagem..."
+            class="message-input"
+            maxlength="1000"
+          />
+          <div class="input-actions">
+            <button 
+              class="emoji-btn" 
+              @click="showEmojiPicker = !showEmojiPicker"
+              title="Adicionar emoji"
+            >
+              <IconComponent name="smile" :size="18" />
+            </button>
+            <button 
+              v-if="newMessage.trim()" 
+              class="send-btn active" 
+              @click="sendMessage"
+              title="Enviar mensagem"
+            >
+              <IconComponent name="send" :size="20" />
+            </button>
+            <button 
+              v-else
+              class="voice-btn" 
+              @mousedown="startVoiceRecording"
+              @mouseup="stopVoiceRecording"
+              @mouseleave="stopVoiceRecording"
+              title="Gravar áudio"
+            >
+              <IconComponent name="mic" :size="20" />
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Emoji Picker -->
+      <div v-if="showEmojiPicker" class="emoji-picker">
+        <div class="emoji-categories">
+          <button 
+            v-for="category in emojiCategories" 
+            :key="category.name"
+            @click="selectedEmojiCategory = category.name"
+            class="emoji-category-btn"
+            :class="{ active: selectedEmojiCategory === category.name }"
+            :title="category.label"
+          >
+            {{ category.icon }}
+          </button>
+        </div>
+        <div class="emoji-grid">
+          <button 
+            v-for="emoji in currentCategoryEmojis" 
+            :key="emoji"
+            @click="insertEmoji(emoji)"
+            class="emoji-btn-grid"
+          >
+            {{ emoji }}
+          </button>
+        </div>
       </div>
       
       <!-- Opções de anexo -->
@@ -84,6 +134,26 @@
         <button class="attachment-option" @click="selectDocument">
           <IconComponent name="document" :size="16" />
           Documento
+        </button>
+        <button class="attachment-option" @click="selectVideo">
+          <IconComponent name="video" :size="16" />
+          Vídeo
+        </button>
+        <button class="attachment-option" @click="selectLocation">
+          <IconComponent name="location" :size="16" />
+          Localização
+        </button>
+      </div>
+
+      <!-- Indicador de gravação de voz -->
+      <div v-if="isRecordingVoice" class="voice-recording-indicator">
+        <div class="recording-animation">
+          <div class="recording-dot"></div>
+        </div>
+        <span class="recording-text">Gravando áudio...</span>
+        <span class="recording-time">{{ recordingTime }}s</span>
+        <button @click="cancelVoiceRecording" class="cancel-recording-btn">
+          <IconComponent name="close" :size="16" />
         </button>
       </div>
     </div>
@@ -147,7 +217,44 @@ export default {
       isTyping: false,
       isMuted: false,
       typingTimeout: null,
-      messages: []
+      messages: [],
+      
+      // Novas funcionalidades
+      showEmojiPicker: false,
+      selectedEmojiCategory: 'smileys',
+      isRecordingVoice: false,
+      recordingTime: 0,
+      recordingInterval: null,
+      mediaRecorder: null,
+      audioChunks: [],
+      
+      // Emojis organizados por categoria
+      emojiCategories: [
+        { name: 'smileys', label: 'Smileys', icon: '😀' },
+        { name: 'people', label: 'Pessoas', icon: '👋' },
+        { name: 'nature', label: 'Natureza', icon: '🌱' },
+        { name: 'food', label: 'Comida', icon: '🍎' },
+        { name: 'activities', label: 'Atividades', icon: '⚽' },
+        { name: 'travel', label: 'Viagem', icon: '🏖️' },
+        { name: 'objects', label: 'Objetos', icon: '💡' },
+        { name: 'symbols', label: 'Símbolos', icon: '❤️' }
+      ],
+      
+      emojis: {
+        smileys: ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😙', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥'],
+        people: ['👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤏', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '👍', '👎', '👊', '✊', '🤛', '🤜', '👏', '🙌', '👐', '🤲', '🤝', '🙏', '✍️', '💅', '🤳', '💪', '🦾', '🦵', '🦿', '🦶'],
+        nature: ['🌱', '🌿', '🍀', '🍃', '🌾', '💐', '🌷', '🌹', '🥀', '🌺', '🌸', '🌼', '🌻', '🌞', '🌝', '🌛', '🌜', '🌚', '🌕', '🌖', '🌗', '🌘', '🌑', '🌒', '🌓', '🌔', '🌙', '⭐', '🌟', '💫', '⚡', '☄️', '💥', '🔥', '🌪️', '🌈', '☀️', '🌤️', '⛅'],
+        food: ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🫑', '🌽', '🥕', '🫒', '🧄', '🧅', '🥔', '🍠', '🥐', '🥖', '🍞', '🥨', '🥯', '🧀', '🥚', '🍳'],
+        activities: ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🎽', '🛹', '🛷', '⛸️', '🥌', '🎿', '⛷️', '🏂', '🪂', '🏋️', '🤼', '🤸', '⛹️'],
+        travel: ['🏖️', '🏝️', '🏜️', '🏞️', '🏟️', '🏛️', '🏗️', '🧱', '🪨', '🪵', '🛖', '🏘️', '🏚️', '🏠', '🏡', '🏢', '🏣', '🏤', '🏥', '🏦', '🏨', '🏩', '🏪', '🏫', '🏬', '🏭', '🏯', '🏰', '🗼', '🗽', '⛪', '🕌', '🛕', '🕍', '⛩️', '🕋', '⛲', '⛺'],
+        objects: ['💡', '🔦', '🕯️', '🪔', '🧯', '🛢️', '💸', '💵', '💴', '💶', '💷', '💰', '💳', '💎', '⚖️', '🧰', '🔧', '🔨', '⚒️', '🛠️', '⛏️', '🔩', '⚙️', '🧱', '⛓️', '🧲', '🔫', '💣', '🧨', '🪓', '🔪', '🗡️', '⚔️', '🛡️', '🚬', '⚰️', '⚱️', '🏺'],
+        symbols: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐', '⛎', '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏']
+      }
+    }
+  },
+  computed: {
+    currentCategoryEmojis() {
+      return this.emojis[this.selectedEmojiCategory] || []
     }
   },
   mounted() {
@@ -437,6 +544,128 @@ export default {
     selectDocument() {
       // Implementar seleção de documento
       this.showAttachmentOptions = false
+    },
+
+    selectVideo() {
+      // Implementar seleção de vídeo
+      this.showAttachmentOptions = false
+    },
+
+    selectLocation() {
+      // Implementar compartilhamento de localização
+      this.showAttachmentOptions = false
+    },
+
+    // === FUNCIONALIDADES DE EMOJI ===
+
+    insertEmoji(emoji) {
+      const input = this.$refs.messageInput
+      const cursorPos = input.selectionStart || this.newMessage.length
+      
+      this.newMessage = 
+        this.newMessage.slice(0, cursorPos) + 
+        emoji + 
+        this.newMessage.slice(cursorPos)
+      
+      // Manter foco no input
+      this.$nextTick(() => {
+        input.focus()
+        input.setSelectionRange(cursorPos + emoji.length, cursorPos + emoji.length)
+      })
+    },
+
+    handleInputFocus() {
+      // Esconder emoji picker quando focar no input
+      this.showEmojiPicker = false
+    },
+
+    handleInputBlur() {
+      // Delay para permitir clique em emojis
+      setTimeout(() => {
+        if (!this.showEmojiPicker) return
+        this.showEmojiPicker = false
+      }, 200)
+    },
+
+    // === FUNCIONALIDADES DE VOZ ===
+
+    async startVoiceRecording() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        this.mediaRecorder = new MediaRecorder(stream)
+        this.audioChunks = []
+        this.recordingTime = 0
+        this.isRecordingVoice = true
+
+        this.mediaRecorder.ondataavailable = (event) => {
+          this.audioChunks.push(event.data)
+        }
+
+        this.mediaRecorder.onstop = () => {
+          this.processVoiceRecording()
+        }
+
+        this.mediaRecorder.start()
+        
+        // Contador de tempo
+        this.recordingInterval = setInterval(() => {
+          this.recordingTime++
+          if (this.recordingTime >= 60) { // Máximo 60 segundos
+            this.stopVoiceRecording()
+          }
+        }, 1000)
+
+      } catch (error) {
+        console.error('Erro ao acessar microfone:', error)
+        alert('Não foi possível acessar o microfone. Verifique as permissões.')
+      }
+    },
+
+    stopVoiceRecording() {
+      if (this.mediaRecorder && this.isRecordingVoice) {
+        this.mediaRecorder.stop()
+        this.mediaRecorder.stream.getTracks().forEach(track => track.stop())
+        clearInterval(this.recordingInterval)
+        this.isRecordingVoice = false
+      }
+    },
+
+    cancelVoiceRecording() {
+      if (this.mediaRecorder && this.isRecordingVoice) {
+        this.mediaRecorder.stop()
+        this.mediaRecorder.stream.getTracks().forEach(track => track.stop())
+        clearInterval(this.recordingInterval)
+        this.isRecordingVoice = false
+        this.audioChunks = []
+      }
+    },
+
+    processVoiceRecording() {
+      if (this.audioChunks.length === 0) return
+
+      const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' })
+      const audioUrl = URL.createObjectURL(audioBlob)
+      
+      // Criar mensagem de áudio
+      const audioMessage = {
+        id: Date.now(),
+        type: 'audio',
+        content: audioUrl,
+        duration: this.recordingTime,
+        timestamp: Date.now(),
+        isOwn: true,
+        status: 'sending'
+      }
+
+      this.messages.push(audioMessage)
+      this.saveMessages()
+      this.scrollToBottom()
+      
+      // Simular envio
+      setTimeout(() => {
+        audioMessage.status = 'delivered'
+        this.saveMessages()
+      }, 1000)
     }
   }
 }
@@ -669,20 +898,45 @@ export default {
   background: var(--background);
 }
 
-.message-input {
+.message-input-wrapper {
   flex: 1;
+  display: flex;
+  align-items: center;
+  background: var(--card);
   border: 1px solid var(--border);
   border-radius: 20px;
-  padding: 10px 16px;
-  background: var(--background);
-  color: var(--foreground);
-  font-size: 14px;
-  outline: none;
-  resize: none;
+  overflow: hidden;
 }
 
-.message-input:focus {
-  border-color: #0095f6;
+.message-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 10px 15px;
+  color: var(--foreground);
+  font-size: 14px;
+}
+
+.input-actions {
+  display: flex;
+  align-items: center;
+  padding-right: 5px;
+  gap: 5px;
+}
+
+.emoji-btn, .voice-btn {
+  background: none;
+  border: none;
+  color: var(--foreground-muted);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.emoji-btn:hover, .voice-btn:hover {
+  background: var(--border);
+  color: var(--foreground);
 }
 
 .send-btn {
@@ -701,7 +955,7 @@ export default {
 }
 
 .send-btn.active {
-  background: #0095f6;
+  background: var(--primary);
   color: white;
 }
 
@@ -709,32 +963,149 @@ export default {
   cursor: not-allowed;
 }
 
+/* Emoji Picker */
+.emoji-picker {
+  position: absolute;
+  bottom: 80px;
+  right: 20px;
+  width: 320px;
+  height: 300px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.emoji-categories {
+  display: flex;
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+  padding: 8px;
+  gap: 4px;
+}
+
+.emoji-category-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.emoji-category-btn:hover {
+  background: var(--border);
+}
+
+.emoji-category-btn.active {
+  background: var(--primary);
+}
+
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  padding: 8px;
+  height: 220px;
+  overflow-y: auto;
+}
+
+.emoji-btn-grid {
+  background: none;
+  border: none;
+  font-size: 20px;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.emoji-btn-grid:hover {
+  background: var(--border);
+  transform: scale(1.1);
+}
+
+/* Gravação de voz */
+.voice-recording-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: var(--error);
+  color: white;
+  border-radius: 8px;
+  margin: 8px 20px;
+}
+
+.recording-animation {
+  display: flex;
+  align-items: center;
+}
+
+.recording-dot {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.recording-text {
+  font-weight: 500;
+}
+
+.recording-time {
+  margin-left: auto;
+  font-weight: bold;
+}
+
+.cancel-recording-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: 4px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
 /* Opções de anexo */
 .attachment-options {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
-  margin-top: 8px;
-  padding: 8px;
-  background: var(--background);
-  border-radius: 12px;
+  padding: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 8px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .attachment-option {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: var(--card);
+  gap: 8px;
+  padding: 10px;
+  background: transparent;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 6px;
   color: var(--foreground);
-  font-size: 12px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  font-size: 14px;
 }
 
 .attachment-option:hover {
-  background: var(--background);
+  background: var(--border);
+  border-color: var(--primary);
 }
 
 /* Painel de informações do usuário */
@@ -828,6 +1199,28 @@ export default {
   
   .message-bubble {
     max-width: 85%;
+  }
+  
+  .emoji-picker {
+    width: 280px;
+    height: 250px;
+    bottom: 70px;
+    right: 10px;
+  }
+  
+  .emoji-grid {
+    grid-template-columns: repeat(6, 1fr);
+    height: 180px;
+  }
+  
+  .attachment-options {
+    grid-template-columns: 1fr;
+    margin: 8px 10px;
+  }
+  
+  .voice-recording-indicator {
+    margin: 8px 10px;
+    padding: 10px 15px;
   }
 }
 </style>

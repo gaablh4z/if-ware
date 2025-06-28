@@ -2,32 +2,35 @@
   <div class="feed-container">
     <header class="feed-header">
       <span class="logo">Velo</span>
-      <span
-        v-if="currentTab !== 'profile' && currentTab !== 'notifications'"
-        class="notification-icon"
-        title="Notificações"
-        @click="currentTab = 'notifications'"
-      >
-        <img 
-          :src="require('@/assets/icons/notifications.svg')" 
-          alt="Notificações"
-          width="28" 
-          height="28" 
-          style="object-fit: contain; filter: currentColor;"
-        />
+      <div class="header-controls">
+        <ThemeSelector :expandable="true" />
         <span
-          v-if="notificacoesNaoLidas > 0"
-          class="badge"
-          :class="{
-            urgente: notificacaoUrgente,
-            positiva: notificacaoPositiva
-          }"
-        >{{ notificacoesNaoLidas }}</span>
-      </span>
+          v-if="currentTab !== 'profile' && currentTab !== 'notifications'"
+          class="notification-icon"
+          title="Notificações"
+          @click="currentTab = 'notifications'"
+        >
+          <img 
+            :src="require('@/assets/icons/notifications.svg')" 
+            alt="Notificações"
+            width="28" 
+            height="28" 
+            style="object-fit: contain; filter: currentColor;"
+          />
+          <span
+            v-if="notificacoesNaoLidas > 0"
+            class="badge"
+            :class="{
+              urgente: notificacaoUrgente,
+              positiva: notificacaoPositiva
+            }"
+          >{{ notificacoesNaoLidas }}</span>
+        </span>
+      </div>
     </header>
     <transition name="fade" mode="out-in">
       <main :key="currentTab" :class="{ 'no-navbar': currentTab === 'notifications' }">
-        <HomeScreen v-if="currentTab === 'home'" :posts="posts" />
+        <HomeScreen v-if="currentTab === 'home'" :posts="posts" :current-user="currentUser" />
         <SearchScreen v-else-if="currentTab === 'search'" />
         <PublishScreen v-else-if="currentTab === 'publish'" />
         <MessagesScreen v-else-if="currentTab === 'messages'" :current-user="currentUser" />
@@ -82,6 +85,7 @@ import MessagesScreen from './MessagesScreen.vue'
 import ProfileScreen from './ProfileScreen.vue'
 import NotificationsScreen from './NotificationsScreen.vue'
 import IconComponent from './IconComponent.vue'
+import ThemeSelector from './ThemeSelector.vue'
 
 export default {
   name: 'FeedPosts',
@@ -98,7 +102,8 @@ export default {
     MessagesScreen,
     ProfileScreen,
     NotificationsScreen,
-    IconComponent
+    IconComponent,
+    ThemeSelector
   },
   data() {
     return {
@@ -120,15 +125,41 @@ export default {
       notificacaoUrgente: false, // true para badge vermelho
       notificacaoPositiva: true, // true para badge verde
       notificacoes: [
-        { date: '2024-06-25', type: 'mensagem', title: 'Nova mensagem', description: 'Você recebeu uma mensagem de Ana.', status: 'urgente' },
-        { date: '2024-06-25', type: 'interacao', title: 'Novo comentário', description: 'João comentou em seu post.', status: 'positiva' },
-        { date: '2024-06-24', type: 'evento', title: 'Evento IFMT', description: 'Participe do evento amanhã!', status: 'info' }
+        {
+          id: 1,
+          type: 'like',
+          username: 'ana.silva',
+          timestamp: new Date(Date.now() - 1000 * 60 * 15),
+          read: false,
+          preview: 'https://picsum.photos/50/50?random=10'
+        },
+        {
+          id: 2,
+          type: 'comment',
+          username: 'carlos.pereira',
+          timestamp: new Date(Date.now() - 1000 * 60 * 60),
+          read: false,
+          comment: 'Excelente trabalho!',
+          preview: 'https://picsum.photos/50/50?random=11'
+        },
+        {
+          id: 3,
+          type: 'follow',
+          username: 'lucia.ferreira',
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3),
+          read: true,
+          following: false
+        }
       ]
     }
   },
   methods: {
     goBack() {
       this.currentTab = this.previousTab
+    },
+    
+    navigateToTab(tabName) {
+      this.currentTab = tabName;
     }
   },
   watch: {
@@ -167,6 +198,13 @@ export default {
   border-bottom: 1px solid var(--border);
   background: var(--background);
 }
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
 .logo {
   font-family: 'Arial Black', Arial, sans-serif;
   font-size: 1.5em;

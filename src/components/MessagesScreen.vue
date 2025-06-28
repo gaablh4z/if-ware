@@ -35,24 +35,62 @@
               placeholder="Pesquisar conversas..." 
               v-model="searchQuery"
               class="search-input"
+              @input="handleSearch"
             />
+            <button v-if="searchQuery" @click="clearSearch" class="clear-search-btn">
+              <IconComponent name="close" :size="14" />
+            </button>
           </div>
+          <div class="search-filters" v-if="showAdvancedSearch">
+            <button 
+              v-for="filter in searchFilters" 
+              :key="filter.key"
+              @click="toggleSearchFilter(filter.key)"
+              class="filter-btn"
+              :class="{ active: activeFilters.includes(filter.key) }"
+            >
+              <IconComponent :name="filter.icon" :size="14" />
+              {{ filter.label }}
+            </button>
+          </div>
+          <button @click="showAdvancedSearch = !showAdvancedSearch" class="advanced-search-btn">
+            <IconComponent name="filter" :size="16" />
+            Filtros
+          </button>
         </div>
 
         <!-- Seção de conversas ativas -->
         <div class="active-conversations" v-if="activeChats.length > 0">
-          <h3 class="section-title">Conversas Ativas</h3>
+          <div class="section-header">
+            <h3 class="section-title">Conversas Ativas</h3>
+            <div class="section-actions">
+              <button @click="toggleConversationSort" class="sort-btn" :title="sortTooltip">
+                <IconComponent :name="sortIcon" :size="16" />
+              </button>
+              <button @click="markAllAsRead" class="mark-read-btn" title="Marcar todas como lidas">
+                <IconComponent name="check-all" :size="16" />
+              </button>
+            </div>
+          </div>
           <div class="chat-list">
             <div 
               v-for="chat in filteredChats" 
               :key="chat.id"
               class="chat-item"
-              :class="{ 'unread': chat.unread }"
+              :class="{ 
+                'unread': chat.unread, 
+                'pinned': chat.pinned,
+                'archived': chat.archived 
+              }"
               @click="openChat(chat)"
+              @contextmenu.prevent="showChatContextMenu(chat, $event)"
             >
               <div class="chat-avatar">
                 <img :src="chat.avatar" :alt="chat.name" />
                 <span v-if="chat.online" class="online-indicator"></span>
+                <span v-if="chat.pinned" class="pin-indicator">
+                  <IconComponent name="pin" :size="12" />
+                </span>
               </div>
               <div class="chat-info">
                 <div class="chat-header">
@@ -61,8 +99,19 @@
                   <span class="chat-time">{{ chat.lastMessageTime }}</span>
                 </div>
                 <div class="chat-preview">
-                  <span class="last-message">{{ chat.lastMessage }}</span>
-                  <span v-if="chat.unreadCount > 0" class="unread-badge">{{ chat.unreadCount }}</span>
+                  <span class="last-message" :class="{ 'typing': chat.isTyping }">
+                    <span v-if="chat.isTyping" class="typing-text">
+                      <IconComponent name="edit" :size="12" />
+                      digitando...
+                    </span>
+                    <span v-else>{{ chat.lastMessage }}</span>
+                  </span>
+                  <div class="chat-badges">
+                    <span v-if="chat.unreadCount > 0" class="unread-badge">{{ chat.unreadCount }}</span>
+                    <span v-if="chat.muted" class="mute-badge" title="Silenciado">
+                      <IconComponent name="mute" :size="12" />
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -180,6 +229,30 @@
             </div>
           </div>
         </div>
+
+        <!-- Menu de contexto para conversas -->
+        <div v-if="showContextMenu" class="context-menu" :style="contextMenuStyle" @click.stop>
+          <button @click="pinConversation" class="context-menu-item">
+            <IconComponent :name="selectedChatForContext?.pinned ? 'unpin' : 'pin'" :size="16" />
+            {{ selectedChatForContext?.pinned ? 'Desafixar' : 'Fixar' }}
+          </button>
+          <button @click="muteConversation" class="context-menu-item">
+            <IconComponent :name="selectedChatForContext?.muted ? 'unmute' : 'mute'" :size="16" />
+            {{ selectedChatForContext?.muted ? 'Ativar som' : 'Silenciar' }}
+          </button>
+          <button @click="markConversationAsRead" class="context-menu-item">
+            <IconComponent name="check" :size="16" />
+            Marcar como lida
+          </button>
+          <button @click="archiveConversation" class="context-menu-item">
+            <IconComponent name="archive" :size="16" />
+            Arquivar
+          </button>
+          <button @click="deleteConversation" class="context-menu-item danger">
+            <IconComponent name="delete" :size="16" />
+            Excluir conversa
+          </button>
+        </div>
       </div>
     </div>
 
@@ -200,6 +273,7 @@
 <script>
 import IconComponent from './IconComponent.vue'
 import ChatScreen from './ChatScreen.vue'
+import messagesService from '@/services/messagesService.js'
 
 export default {
   name: 'MessagesScreen',
@@ -220,24 +294,85 @@ export default {
       newMessageQuery: '',
       selectedChat: null,
       activeChats: [],
-      availableUsers: []
+      availableUsers: [],
+      
+      // Novas funcionalidades
+      showAdvancedSearch: false,
+      activeFilters: [],
+      sortBy: 'timestamp', // 'timestamp', 'name', 'unread'
+      sortOrder: 'desc',
+      
+      // Menu de contexto
+      showContextMenu: false,
+      contextMenuStyle: {},
+      selectedChatForContext: null,
+      
+      // Filtros de busca
+      searchFilters: [
+        { key: 'unread', label: 'Não lidas', icon: 'circle' },
+        { key: 'pinned', label: 'Fixadas', icon: 'pin' },
+        { key: 'online', label: 'Online', icon: 'user' },
+        { key: 'groups', label: 'Grupos', icon: 'group' }
+      ]
     }
   },
   computed: {
     filteredChats() {
-      if (!this.searchQuery) return this.activeChats
-      return this.activeChats.filter(chat => 
-        chat.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        chat.course.toLowerCase().includes(this.searchQuery.toLowerCase())
-      )
+      let chats = [...this.activeChats]
+      
+      // Aplicar filtros de busca
+      if (this.searchQuery) {
+        chats = chats.filter(chat => 
+          chat.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          chat.course.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          chat.lastMessage.toLowerCase().includes(this.searchQuery.toLowerCase())
+        )
+      }
+      
+      // Aplicar filtros avançados
+      if (this.activeFilters.includes('unread')) {
+        chats = chats.filter(chat => chat.unread || chat.unreadCount > 0)
+      }
+      
+      if (this.activeFilters.includes('pinned')) {
+        chats = chats.filter(chat => chat.pinned)
+      }
+      
+      if (this.activeFilters.includes('online')) {
+        chats = chats.filter(chat => chat.online)
+      }
+      
+      // Ordenar
+      chats.sort((a, b) => {
+        // Fixadas sempre no topo
+        if (a.pinned && !b.pinned) return -1
+        if (!a.pinned && b.pinned) return 1
+        
+        if (this.sortBy === 'name') {
+          return this.sortOrder === 'asc' 
+            ? a.name.localeCompare(b.name)
+            : b.name.localeCompare(a.name)
+        }
+        
+        if (this.sortBy === 'unread') {
+          return this.sortOrder === 'asc'
+            ? (a.unreadCount || 0) - (b.unreadCount || 0)
+            : (b.unreadCount || 0) - (a.unreadCount || 0)
+        }
+        
+        // Default: timestamp
+        return this.sortOrder === 'asc'
+          ? (a.timestamp || 0) - (b.timestamp || 0)
+          : (b.timestamp || 0) - (a.timestamp || 0)
+      })
+      
+      return chats
     },
     
     filteredContacts() {
       let contacts = this.availableUsers.filter(user => {
-        // Verificar se currentUser existe e tem id antes de comparar
         const currentUserId = this.currentUser && this.currentUser.id ? this.currentUser.id : null
-        return currentUserId && user.id !== currentUserId && // Não mostrar o próprio usuário
-               !this.isBlocked(user.id) // Não mostrar usuários bloqueados
+        return currentUserId && user.id !== currentUserId && !this.isBlocked(user.id)
       })
       
       if (this.newMessageQuery) {
@@ -253,6 +388,22 @@ export default {
     
     hasAnyConversations() {
       return this.activeChats.length > 0
+    },
+    
+    sortIcon() {
+      switch (this.sortBy) {
+        case 'name': return 'sort-alpha'
+        case 'unread': return 'circle'
+        default: return 'clock'
+      }
+    },
+    
+    sortTooltip() {
+      switch (this.sortBy) {
+        case 'name': return 'Ordenar por nome'
+        case 'unread': return 'Ordenar por não lidas'
+        default: return 'Ordenar por recentes'
+      }
     }
   },
   mounted() {
@@ -453,6 +604,126 @@ export default {
       // Este método é chamado automaticamente pelo computed filteredContacts
       // Mas pode ser usado para ações adicionais quando o usuário digita
     },
+
+    // === NOVOS MÉTODOS ===
+
+    handleSearch() {
+      // Debounce para melhor performance
+      clearTimeout(this.searchTimeout)
+      this.searchTimeout = setTimeout(() => {
+        this.performAdvancedSearch()
+      }, 300)
+    },
+
+    performAdvancedSearch() {
+      if (this.searchQuery.length > 0) {
+        // Usar o serviço de mensagens para busca avançada
+        const results = messagesService.searchMessages(this.searchQuery, null, {
+          type: this.activeFilters.includes('groups') ? 'group' : null
+        })
+        console.log('Resultados da busca:', results)
+      }
+    },
+
+    clearSearch() {
+      this.searchQuery = ''
+      this.activeFilters = []
+    },
+
+    toggleSearchFilter(filterKey) {
+      const index = this.activeFilters.indexOf(filterKey)
+      if (index >= 0) {
+        this.activeFilters.splice(index, 1)
+      } else {
+        this.activeFilters.push(filterKey)
+      }
+    },
+
+    toggleConversationSort() {
+      const sortOptions = ['timestamp', 'name', 'unread']
+      const currentIndex = sortOptions.indexOf(this.sortBy)
+      const nextIndex = (currentIndex + 1) % sortOptions.length
+      this.sortBy = sortOptions[nextIndex]
+    },
+
+    markAllAsRead() {
+      this.activeChats.forEach(chat => {
+        this.markAsRead(chat.id)
+      })
+    },
+
+    // === MENU DE CONTEXTO ===
+
+    showChatContextMenu(chat, event) {
+      this.selectedChatForContext = chat
+      this.contextMenuStyle = {
+        position: 'fixed',
+        top: `${event.clientY}px`,
+        left: `${event.clientX}px`,
+        zIndex: 1000
+      }
+      this.showContextMenu = true
+      
+      // Fechar menu ao clicar fora
+      document.addEventListener('click', this.closeContextMenu, { once: true })
+    },
+
+    closeContextMenu() {
+      this.showContextMenu = false
+      this.selectedChatForContext = null
+    },
+
+    pinConversation() {
+      if (this.selectedChatForContext) {
+        const chatIndex = this.activeChats.findIndex(c => c.id === this.selectedChatForContext.id)
+        if (chatIndex >= 0) {
+          this.activeChats[chatIndex].pinned = !this.activeChats[chatIndex].pinned
+          this.saveConversations()
+        }
+      }
+      this.closeContextMenu()
+    },
+
+    muteConversation() {
+      if (this.selectedChatForContext) {
+        const chatIndex = this.activeChats.findIndex(c => c.id === this.selectedChatForContext.id)
+        if (chatIndex >= 0) {
+          this.activeChats[chatIndex].muted = !this.activeChats[chatIndex].muted
+          this.saveConversations()
+        }
+      }
+      this.closeContextMenu()
+    },
+
+    markConversationAsRead() {
+      if (this.selectedChatForContext) {
+        this.markAsRead(this.selectedChatForContext.id)
+      }
+      this.closeContextMenu()
+    },
+
+    archiveConversation() {
+      if (this.selectedChatForContext) {
+        const chatIndex = this.activeChats.findIndex(c => c.id === this.selectedChatForContext.id)
+        if (chatIndex >= 0) {
+          this.activeChats[chatIndex].archived = true
+          this.saveConversations()
+        }
+      }
+      this.closeContextMenu()
+    },
+
+    deleteConversation() {
+      if (this.selectedChatForContext && confirm('Tem certeza que deseja excluir esta conversa?')) {
+        messagesService.deleteConversation(this.selectedChatForContext.id, this.currentUser.id)
+        this.loadActiveConversations()
+      }
+      this.closeContextMenu()
+    },
+
+    saveConversations() {
+      localStorage.setItem('ifwave_conversations', JSON.stringify(this.activeChats))
+    }
   },
   
   watch: {
@@ -980,6 +1251,177 @@ export default {
   color: var(--foreground-muted);
   font-size: 0.9em;
   line-height: 1.5;
+}
+
+/* === ESTILOS PARA NOVAS FUNCIONALIDADES === */
+
+/* Filtros de busca avançada */
+.search-filters {
+  display: flex;
+  gap: 8px;
+  padding: 8px 0;
+  overflow-x: auto;
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--foreground-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.filter-btn:hover {
+  border-color: var(--primary);
+}
+
+.filter-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.advanced-search-btn {
+  background: none;
+  border: none;
+  color: var(--foreground-muted);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.advanced-search-btn:hover {
+  background: var(--border);
+  color: var(--foreground);
+}
+
+.clear-search-btn {
+  background: none;
+  border: none;
+  color: var(--foreground-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+}
+
+/* Cabeçalho de seção melhorado */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 16px 20px 8px 20px;
+}
+
+.section-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.sort-btn, .mark-read-btn {
+  background: none;
+  border: none;
+  color: var(--foreground-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.sort-btn:hover, .mark-read-btn:hover {
+  background: var(--border);
+  color: var(--foreground);
+}
+
+/* Chat item melhorado */
+.chat-item.pinned {
+  border-left: 3px solid var(--primary);
+  background: var(--card);
+}
+
+.chat-item.archived {
+  opacity: 0.6;
+}
+
+.pin-indicator {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.typing-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-style: italic;
+  color: var(--primary);
+}
+
+.chat-badges {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mute-badge {
+  color: var(--foreground-muted);
+}
+
+/* Menu de contexto */
+.context-menu {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 8px 0;
+  min-width: 160px;
+  z-index: 1000;
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  color: var(--foreground);
+  cursor: pointer;
+  font-size: 14px;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.context-menu-item:hover {
+  background: var(--border);
+}
+
+.context-menu-item.danger {
+  color: var(--error);
+}
+
+.context-menu-item.danger:hover {
+  background: rgba(231, 76, 60, 0.1);
 }
 
 /* Responsividade */

@@ -1,4 +1,10 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import realTimeService from './services/realTimeService.js'
 
-createApp(App).mount('#app')
+const app = createApp(App)
+
+// Disponibiliza o realTimeService globalmente
+app.config.globalProperties.$realTime = realTimeService
+
+app.mount('#app')

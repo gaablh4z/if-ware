@@ -5,7 +5,7 @@ module.exports = defineConfig({
   
   // Configuração para GitHub Pages
   publicPath: process.env.NODE_ENV === 'production'
-    ? '/if-wave/' // substitua 'if-wave' pelo nome do seu repositório
+    ? '/if-ware/' // nome correto do seu repositório
     : '/',
     
   // Configurações de build

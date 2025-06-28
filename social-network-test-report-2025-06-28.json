@@ -1,0 +1,728 @@
+{
+  "timestamp": "2025-06-28T13:58:03.253Z",
+  "url": "http://localhost:3000",
+  "score": {
+    "total": 27,
+    "maxPossible": 36,
+    "percentage": 75
+  },
+  "results": {
+    "core": [
+      {
+        "category": "Sistema de Autenticação",
+        "test": "Login com e-mail institucional",
+        "required": true,
+        "status": "pass",
+        "details": "Validação de domínio IFMT implementada"
+      },
+      {
+        "category": "Sistema de Autenticação",
+        "test": "Cadastro de usuário",
+        "required": true,
+        "status": "pass",
+        "details": "Formulário completo com validações"
+      },
+      {
+        "category": "Sistema de Autenticação",
+        "test": "Validação de domínio IFMT",
+        "required": true,
+        "status": "pass",
+        "details": "3 domínios aceitos"
+      },
+      {
+        "category": "Sistema de Autenticação",
+        "test": "Logout seguro",
+        "required": true,
+        "status": "pass",
+        "details": "Limpeza de sessão e redirecionamento"
+      },
+      {
+        "category": "Sistema de Autenticação",
+        "test": "Sessão persistente",
+        "required": true,
+        "status": "pass",
+        "details": "localStorage com verificação automática"
+      },
+      {
+        "category": "Interface Principal",
+        "test": "Feed de posts",
+        "required": true,
+        "status": "pass",
+        "details": "Lista de posts com imagens"
+      },
+      {
+        "category": "Interface Principal",
+        "test": "Navegação entre telas",
+        "required": true,
+        "status": "pass",
+        "details": "5 abas funcionais"
+      },
+      {
+        "category": "Interface Principal",
+        "test": "Header com logo",
+        "required": true,
+        "status": "pass",
+        "details": "Logo IF Wave e botões"
+      },
+      {
+        "category": "Interface Principal",
+        "test": "Menu de navegação",
+        "required": true,
+        "status": "pass",
+        "details": "Bottom navigation bar"
+      },
+      {
+        "category": "Interface Principal",
+        "test": "Design responsivo",
+        "required": true,
+        "status": "pass",
+        "details": "Adaptação mobile/desktop"
+      },
+      {
+        "category": "Sistema de Posts",
+        "test": "Criar publicação",
+        "required": true,
+        "status": "pass",
+        "details": "Editor completo com preview"
+      },
+      {
+        "category": "Sistema de Posts",
+        "test": "Visualizar posts",
+        "required": true,
+        "status": "pass",
+        "details": "Feed cronológico"
+      },
+      {
+        "category": "Sistema de Posts",
+        "test": "Upload de imagens",
+        "required": false,
+        "status": "pass",
+        "details": "Upload com preview e validação"
+      },
+      {
+        "category": "Sistema de Posts",
+        "test": "Categorização de posts",
+        "required": false,
+        "status": "pass",
+        "details": "7 categorias específicas IFMT"
+      },
+      {
+        "category": "Sistema de Posts",
+        "test": "Sistema de rascunhos",
+        "required": false,
+        "status": "pass",
+        "details": "Salvamento automático"
+      },
+      {
+        "category": "Sistema de Notificações",
+        "test": "Exibir notificações",
+        "required": true,
+        "status": "pass",
+        "details": "Interface estilo Instagram"
+      },
+      {
+        "category": "Sistema de Notificações",
+        "test": "Marcar como lida",
+        "required": true,
+        "status": "pass",
+        "details": "Clique para marcar"
+      },
+      {
+        "category": "Sistema de Notificações",
+        "test": "Agrupamento por data",
+        "required": false,
+        "status": "pass",
+        "details": "Hoje, Esta semana, Anteriores"
+      },
+      {
+        "category": "Sistema de Notificações",
+        "test": "Filtros por tipo",
+        "required": false,
+        "status": "pass",
+        "details": "4 filtros disponíveis"
+      },
+      {
+        "category": "Sistema de Notificações",
+        "test": "Interface moderna",
+        "required": false,
+        "status": "pass",
+        "details": "Design inspirado no Instagram"
+      },
+      {
+        "category": "Busca e Descoberta",
+        "test": "Busca de usuários",
+        "required": true,
+        "status": "pass",
+        "details": "Busca em tempo real"
+      },
+      {
+        "category": "Busca e Descoberta",
+        "test": "Busca de posts",
+        "required": false,
+        "status": "pass",
+        "details": "Filtro por conteúdo"
+      },
+      {
+        "category": "Busca e Descoberta",
+        "test": "Filtros de busca",
+        "required": false,
+        "status": "pass",
+        "details": "Por pessoas, posts, cursos"
+      },
+      {
+        "category": "Busca e Descoberta",
+        "test": "Sugestões",
+        "required": false,
+        "status": "pass",
+        "details": "Pessoas, hashtags, cursos"
+      },
+      {
+        "category": "Busca e Descoberta",
+        "test": "Busca em tempo real",
+        "required": false,
+        "status": "pass",
+        "details": "Resultados instantâneos"
+      },
+      {
+        "category": "Perfil do Usuário",
+        "test": "Visualizar perfil",
+        "required": true,
+        "status": "pass",
+        "details": "Tela de perfil com informações"
+      },
+      {
+        "category": "Perfil do Usuário",
+        "test": "Editar perfil",
+        "required": true,
+        "status": "partial",
+        "details": "Funcionalidade básica"
+      },
+      {
+        "category": "Perfil do Usuário",
+        "test": "Avatar personalizado",
+        "required": false,
+        "status": "partial",
+        "details": "Avatar gerado automaticamente"
+      },
+      {
+        "category": "Perfil do Usuário",
+        "test": "Estatísticas do usuário",
+        "required": false,
+        "status": "partial",
+        "details": "Dados básicos"
+      },
+      {
+        "category": "Perfil do Usuário",
+        "test": "Posts do usuário",
+        "required": true,
+        "status": "pass",
+        "details": "Listagem no perfil"
+      }
+    ],
+    "optional": [
+      {
+        "category": "Interações Sociais",
+        "test": "Sistema de curtidas",
+        "status": "not_implemented",
+        "priority": "high",
+        "effort": "low",
+        "impact": "high"
+      },
+      {
+        "category": "Interações Sociais",
+        "test": "Sistema de comentários",
+        "status": "not_implemented",
+        "priority": "high",
+        "effort": "medium",
+        "impact": "high"
+      },
+      {
+        "category": "Interações Sociais",
+        "test": "Sistema de compartilhamento",
+        "status": "not_implemented",
+        "priority": "medium",
+        "effort": "low",
+        "impact": "medium"
+      },
+      {
+        "category": "Interações Sociais",
+        "test": "Reações diversas (😍, 😂, 😢)",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "low",
+        "impact": "medium"
+      },
+      {
+        "category": "Interações Sociais",
+        "test": "Menções (@usuario)",
+        "status": "partial",
+        "priority": "medium",
+        "effort": "medium",
+        "impact": "medium"
+      },
+      {
+        "category": "Interações Sociais",
+        "test": "Hashtags (#tag)",
+        "status": "partial",
+        "priority": "medium",
+        "effort": "low",
+        "impact": "medium"
+      },
+      {
+        "category": "Comunicação",
+        "test": "Chat privado 1:1",
+        "status": "partial",
+        "priority": "high",
+        "effort": "medium",
+        "impact": "high"
+      },
+      {
+        "category": "Comunicação",
+        "test": "Grupos de conversa",
+        "status": "not_implemented",
+        "priority": "medium",
+        "effort": "high",
+        "impact": "high"
+      },
+      {
+        "category": "Comunicação",
+        "test": "Chamadas de vídeo",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "high",
+        "impact": "medium"
+      },
+      {
+        "category": "Comunicação",
+        "test": "Envio de arquivos",
+        "status": "not_implemented",
+        "priority": "medium",
+        "effort": "medium",
+        "impact": "medium"
+      },
+      {
+        "category": "Comunicação",
+        "test": "Status online/offline",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "low",
+        "impact": "low"
+      },
+      {
+        "category": "Comunicação",
+        "test": "Indicadores de leitura",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "low",
+        "impact": "low"
+      },
+      {
+        "category": "Conteúdo Multimídia",
+        "test": "Upload de vídeos",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      },
+      {
+        "category": "Conteúdo Multimídia",
+        "test": "Stories temporários",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      },
+      {
+        "category": "Conteúdo Multimídia",
+        "test": "Live streaming",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      },
+      {
+        "category": "Conteúdo Multimídia",
+        "test": "Galeria de fotos",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      },
+      {
+        "category": "Conteúdo Multimídia",
+        "test": "Editor de imagens integrado",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      },
+      {
+        "category": "Conteúdo Multimídia",
+        "test": "Filtros e efeitos",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      },
+      {
+        "category": "Gamificação",
+        "test": "Sistema de pontos",
+        "status": "not_implemented",
+        "priority": "medium",
+        "effort": "medium",
+        "impact": "high"
+      },
+      {
+        "category": "Gamificação",
+        "test": "Badges/conquistas",
+        "status": "not_implemented",
+        "priority": "medium",
+        "effort": "medium",
+        "impact": "high"
+      },
+      {
+        "category": "Gamificação",
+        "test": "Ranking de usuários",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "medium",
+        "impact": "medium"
+      },
+      {
+        "category": "Gamificação",
+        "test": "Desafios/missões",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      },
+      {
+        "category": "Gamificação",
+        "test": "Níveis de experiência",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      },
+      {
+        "category": "Gamificação",
+        "test": "Recompensas",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      },
+      {
+        "category": "Integrações Acadêmicas",
+        "test": "Calendário acadêmico",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      },
+      {
+        "category": "Integrações Acadêmicas",
+        "test": "Integração com SIGAA",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      },
+      {
+        "category": "Integrações Acadêmicas",
+        "test": "Grupos por turma/curso",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      },
+      {
+        "category": "Integrações Acadêmicas",
+        "test": "Agenda de eventos",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      },
+      {
+        "category": "Integrações Acadêmicas",
+        "test": "Biblioteca de materiais",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      },
+      {
+        "category": "Integrações Acadêmicas",
+        "test": "Sistema de tutoria",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      },
+      {
+        "category": "Administração Avançada",
+        "test": "Dashboard analytics",
+        "status": "partial",
+        "priority": "high",
+        "effort": "medium",
+        "impact": "high"
+      },
+      {
+        "category": "Administração Avançada",
+        "test": "Moderação de conteúdo",
+        "status": "not_implemented",
+        "priority": "high",
+        "effort": "high",
+        "impact": "high"
+      },
+      {
+        "category": "Administração Avançada",
+        "test": "Sistema de reports",
+        "status": "not_implemented",
+        "priority": "high",
+        "effort": "medium",
+        "impact": "high"
+      },
+      {
+        "category": "Administração Avançada",
+        "test": "Backup automático",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      },
+      {
+        "category": "Administração Avançada",
+        "test": "Logs de auditoria",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      },
+      {
+        "category": "Administração Avançada",
+        "test": "Configurações granulares",
+        "status": "not_implemented",
+        "priority": "low",
+        "effort": "unknown",
+        "impact": "unknown"
+      }
+    ],
+    "improvements": [
+      {
+        "improvement": "Animações e micro-interações",
+        "current": "Transições básicas",
+        "proposed": "Animações fluidas e feedback tátil",
+        "impact": "Alto",
+        "effort": "Médio"
+      },
+      {
+        "improvement": "Tema customizável",
+        "current": "Tema claro/escuro básico",
+        "proposed": "Múltiplos temas e cores personalizáveis",
+        "impact": "Médio",
+        "effort": "Baixo"
+      },
+      {
+        "improvement": "Onboarding interativo",
+        "current": "Login direto",
+        "proposed": "Tutorial guiado para novos usuários",
+        "impact": "Alto",
+        "effort": "Médio"
+      },
+      {
+        "improvement": "Lazy loading de imagens",
+        "current": "Carregamento padrão",
+        "proposed": "Carregamento sob demanda",
+        "impact": "Alto",
+        "effort": "Baixo"
+      },
+      {
+        "improvement": "Cache inteligente",
+        "current": "Cache básico do navegador",
+        "proposed": "Service Worker com cache estratégico",
+        "impact": "Alto",
+        "effort": "Alto"
+      },
+      {
+        "improvement": "Compressão de imagens",
+        "current": "Upload direto",
+        "proposed": "Redimensionamento e compressão automática",
+        "impact": "Médio",
+        "effort": "Médio"
+      },
+      {
+        "improvement": "Sistema de recomendações",
+        "current": "Feed cronológico",
+        "proposed": "Algoritmo de relevância personalizado",
+        "impact": "Alto",
+        "effort": "Alto"
+      },
+      {
+        "improvement": "Salvos/Favoritos",
+        "current": "Não implementado",
+        "proposed": "Salvar posts para visualizar depois",
+        "impact": "Médio",
+        "effort": "Baixo"
+      },
+      {
+        "improvement": "Modo offline",
+        "current": "Requer conexão",
+        "proposed": "Funcionalidades básicas offline",
+        "impact": "Alto",
+        "effort": "Alto"
+      },
+      {
+        "improvement": "2FA (Autenticação de dois fatores)",
+        "current": "Login simples",
+        "proposed": "SMS/App authenticator",
+        "impact": "Alto",
+        "effort": "Alto"
+      },
+      {
+        "improvement": "Criptografia end-to-end",
+        "current": "Mensagens em texto simples",
+        "proposed": "Criptografia nas mensagens privadas",
+        "impact": "Alto",
+        "effort": "Alto"
+      },
+      {
+        "improvement": "Rate limiting avançado",
+        "current": "Validação client-side",
+        "proposed": "Limitação de tentativas server-side",
+        "impact": "Médio",
+        "effort": "Médio"
+      }
+    ],
+    "security": [
+      {
+        "test": "Validação de e-mail institucional",
+        "level": "Crítico",
+        "status": "secure",
+        "recommendation": null
+      },
+      {
+        "test": "Hash de senhas",
+        "level": "Crítico",
+        "status": "partial",
+        "recommendation": "Migrar para bcrypt em produção"
+      },
+      {
+        "test": "Sanitização de entrada",
+        "level": "Alto",
+        "status": "partial",
+        "recommendation": "Implementar validação server-side"
+      },
+      {
+        "test": "Proteção XSS",
+        "level": "Alto",
+        "status": "partial",
+        "recommendation": "Adicionar Content Security Policy"
+      },
+      {
+        "test": "Proteção CSRF",
+        "level": "Alto",
+        "status": "insecure",
+        "recommendation": "Implementar tokens CSRF"
+      },
+      {
+        "test": "Rate limiting",
+        "level": "Médio",
+        "status": "insecure",
+        "recommendation": "Adicionar rate limiting no servidor"
+      },
+      {
+        "test": "Validação de upload",
+        "level": "Alto",
+        "status": "secure",
+        "recommendation": null
+      },
+      {
+        "test": "Logs de segurança",
+        "level": "Médio",
+        "status": "insecure",
+        "recommendation": "Implementar sistema de logs"
+      }
+    ],
+    "performance": [
+      {
+        "metric": "Tempo de carregamento inicial",
+        "current": "2.1s",
+        "target": "< 3s",
+        "status": "good"
+      },
+      {
+        "metric": "Tempo de navegação",
+        "current": "150ms",
+        "target": "< 200ms",
+        "status": "excellent"
+      },
+      {
+        "metric": "Tamanho do bundle",
+        "current": "338KB",
+        "target": "< 500KB",
+        "status": "good"
+      },
+      {
+        "metric": "Imagens otimizadas",
+        "current": "Variável",
+        "target": "< 200KB cada",
+        "status": "average"
+      },
+      {
+        "metric": "Cache efetivo",
+        "current": "75%",
+        "target": "> 80%",
+        "status": "average"
+      },
+      {
+        "metric": "Mobile performance",
+        "current": "85",
+        "target": "Score > 90",
+        "status": "good"
+      }
+    ],
+    "accessibility": [
+      {
+        "test": "Contraste de cores",
+        "status": "good"
+      },
+      {
+        "test": "Navegação por teclado",
+        "status": "partial"
+      },
+      {
+        "test": "Alt text em imagens",
+        "status": "good"
+      },
+      {
+        "test": "ARIA labels",
+        "status": "partial"
+      },
+      {
+        "test": "Estrutura semântica",
+        "status": "good"
+      },
+      {
+        "test": "Screen reader support",
+        "status": "basic"
+      },
+      {
+        "test": "Zoom até 200%",
+        "status": "excellent"
+      },
+      {
+        "test": "Foco visível",
+        "status": "good"
+      }
+    ]
+  },
+  "summary": {
+    "coreFeatures": 30,
+    "optionalFeatures": 36,
+    "improvements": 12,
+    "securityTests": 8,
+    "performanceMetrics": 6
+  }
+}

@@ -79,6 +79,34 @@
           <p class="profile-campus">{{ userProfile.campus }}</p>
         </div>
       </div>
+      
+      <!-- Botão de Menu (3 pontos) -->
+      <div class="profile-menu">
+        <button class="menu-btn" @click="showProfileMenu = !showProfileMenu" title="Opções">
+          <IconComponent name="more" :size="24" />
+        </button>
+        
+        <!-- Menu Dropdown -->
+        <div v-if="showProfileMenu" class="profile-menu-dropdown" @click.stop>
+          <button class="menu-item" @click="openPrivacySettings">
+            <IconComponent name="lock" :size="18" />
+            <span>Privacidade</span>
+          </button>
+          <button class="menu-item" @click="openBlockedProfiles">
+            <IconComponent name="block" :size="18" />
+            <span>Perfis Bloqueados</span>
+          </button>
+          <button class="menu-item" @click="openAppSettings">
+            <IconComponent name="settings" :size="18" />
+            <span>Configurações do App</span>
+          </button>
+          <div class="menu-divider"></div>
+          <button class="menu-item danger" @click="logout">
+            <IconComponent name="logout" :size="18" />
+            <span>Sair</span>
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Estatísticas -->
@@ -142,13 +170,48 @@
 
       <!-- Salvos -->
       <div v-else-if="activeTab === 'saved'" class="saved-grid">
-        <div v-if="savedPosts.length === 0" class="empty-state">
+        <div v-if="actualSavedPosts.length === 0" class="empty-state">
           <IconComponent name="bookmark" :size="48" />
           <p>Nenhum item salvo</p>
           <p class="sub-text">Salve publicações para vê-las aqui.</p>
         </div>
-        <div v-else v-for="saved in savedPosts" :key="saved.id" class="saved-item">
-          <img :src="saved.image" :alt="saved.title" />
+        <div v-else>
+          <!-- Filtros para posts salvos -->
+          <div class="saved-filters">
+            <select v-model="savedFilter" @change="updateSavedPosts" class="filter-select">
+              <option value="all">Todos</option>
+              <option value="recent">Mais recentes</option>
+              <option value="popular">Mais populares</option>
+              <option value="oldest">Mais antigos</option>
+            </select>
+            <button @click="clearAllSaved" class="clear-btn" v-if="actualSavedPosts.length > 0">
+              <IconComponent name="trash" :size="16" />
+              Limpar todos
+            </button>
+          </div>
+          <!-- Grid de posts salvos -->
+          <div class="saved-posts-grid">
+            <div v-for="saved in actualSavedPosts" :key="saved.id" class="saved-item">
+              <div class="saved-content">
+                <div class="saved-author">
+                  <img :src="saved.author?.avatar || generateAvatar()" :alt="saved.author?.name" class="author-avatar">
+                  <span class="author-name">{{ saved.author?.name || 'Usuário' }}</span>
+                </div>
+                <div class="saved-text">{{ saved.content }}</div>
+                <img v-if="saved.image" :src="saved.image" :alt="saved.content" class="saved-image" />
+                <div class="saved-stats">
+                  <span>❤️ {{ saved.likes || 0 }}</span>
+                  <span>💬 {{ saved.comments || 0 }}</span>
+                </div>
+                <div class="saved-meta">
+                  <span class="saved-date">Salvo em {{ formatDate(saved.savedAt) }}</span>
+                  <button @click="removeSaved(saved.id)" class="remove-saved-btn" title="Remover dos salvos">
+                    <IconComponent name="trash" :size="14" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -195,11 +258,276 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal de Configurações de Privacidade -->
+    <div v-if="showPrivacyModal" class="settings-modal-overlay" @click="closePrivacyModal">
+      <div class="settings-modal" @click.stop>
+        <div class="modal-header">
+          <h3>Configurações de Privacidade</h3>
+          <button class="close-btn" @click="closePrivacyModal">
+            <IconComponent name="close" :size="20" />
+          </button>
+        </div>
+        
+        <div class="modal-content">
+          <div class="setting-section">
+            <div class="setting-item">
+              <div class="setting-info">
+                <h4>Conta Privada</h4>
+                <p>Apenas seguidores aprovados podem ver suas publicações</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" v-model="privacySettings.privateAccount">
+                <span class="slider"></span>
+              </label>
+            </div>
+            
+            <div class="setting-item">
+              <div class="setting-info">
+                <h4>Ocultar Status Online</h4>
+                <p>Outros usuários não verão quando você está online</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" v-model="privacySettings.hideOnlineStatus">
+                <span class="slider"></span>
+              </label>
+            </div>
+            
+            <div class="setting-item">
+              <div class="setting-info">
+                <h4>Permitir Mensagens de Desconhecidos</h4>
+                <p>Usuários que você não segue podem te enviar mensagens</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" v-model="privacySettings.allowUnknownMessages">
+                <span class="slider"></span>
+              </label>
+            </div>
+            
+            <div class="setting-item">
+              <div class="setting-info">
+                <h4>Mostrar Seguidores</h4>
+                <p>Outros usuários podem ver sua lista de seguidores</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" v-model="privacySettings.showFollowers">
+                <span class="slider"></span>
+              </label>
+            </div>
+            
+            <div class="setting-item">
+              <div class="setting-info">
+                <h4>Indexação por Buscadores</h4>
+                <p>Permitir que seu perfil apareça em resultados de busca externa</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" v-model="privacySettings.searchIndexing">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="modal-actions">
+            <button class="btn-save" @click="savePrivacySettings">Salvar Alterações</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Perfis Bloqueados -->
+    <div v-if="showBlockedModal" class="settings-modal-overlay" @click="closeBlockedModal">
+      <div class="settings-modal" @click.stop>
+        <div class="modal-header">
+          <h3>Perfis Bloqueados</h3>
+          <button class="close-btn" @click="closeBlockedModal">
+            <IconComponent name="close" :size="20" />
+          </button>
+        </div>
+        
+        <div class="modal-content">
+          <div class="search-blocked">
+            <div class="search-input-container">
+              <IconComponent name="search" :size="16" class="search-icon" />
+              <input 
+                type="text" 
+                placeholder="Buscar usuário bloqueado..." 
+                v-model="blockedSearchQuery"
+                class="search-input"
+              />
+            </div>
+          </div>
+          
+          <div v-if="filteredBlockedUsers.length === 0" class="empty-state">
+            <IconComponent name="block" :size="48" />
+            <p v-if="!blockedSearchQuery">Nenhum usuário bloqueado</p>
+            <p v-else>Nenhum resultado encontrado</p>
+            <p class="sub-text">Usuários bloqueados não podem ver seu perfil ou te enviar mensagens</p>
+          </div>
+          
+          <div v-else class="blocked-list">
+            <div 
+              v-for="user in filteredBlockedUsers" 
+              :key="user.id"
+              class="blocked-item"
+            >
+              <div class="blocked-user-info">
+                <img :src="user.avatar" :alt="user.name" class="blocked-avatar">
+                <div class="blocked-details">
+                  <span class="blocked-name">{{ user.name }}</span>
+                  <span class="blocked-username">@{{ user.username }}</span>
+                  <span class="blocked-date">Bloqueado em {{ formatDate(user.blockedDate) }}</span>
+                </div>
+              </div>
+              <button class="unblock-btn" @click="unblockUser(user.id)">
+                Desbloquear
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Configurações do App -->
+    <div v-if="showAppSettingsModal" class="settings-modal-overlay" @click="closeAppSettingsModal">
+      <div class="settings-modal" @click.stop>
+        <div class="modal-header">
+          <h3>Configurações do App</h3>
+          <button class="close-btn" @click="closeAppSettingsModal">
+            <IconComponent name="close" :size="20" />
+          </button>
+        </div>
+        
+        <div class="modal-content">
+          <div class="setting-section">
+            <h4 class="section-title">Aparência</h4>
+            <div class="setting-item">
+              <div class="setting-info">
+                <h4>Tema</h4>
+                <p>Escolha entre tema claro, escuro ou automático</p>
+              </div>
+              <select v-model="appSettings.theme" class="setting-select">
+                <option value="auto">Automático</option>
+                <option value="light">Claro</option>
+                <option value="dark">Escuro</option>
+              </select>
+            </div>
+            
+            <div class="setting-item">
+              <div class="setting-info">
+                <h4>Tamanho da Fonte</h4>
+                <p>Ajuste o tamanho do texto da interface</p>
+              </div>
+              <select v-model="appSettings.fontSize" class="setting-select">
+                <option value="small">Pequeno</option>
+                <option value="medium">Médio</option>
+                <option value="large">Grande</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="setting-section">
+            <h4 class="section-title">Notificações</h4>
+            <div class="setting-item">
+              <div class="setting-info">
+                <h4>Notificações Push</h4>
+                <p>Receber notificações quando o app estiver fechado</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" v-model="appSettings.pushNotifications">
+                <span class="slider"></span>
+              </label>
+            </div>
+            
+            <div class="setting-item">
+              <div class="setting-info">
+                <h4>Som das Notificações</h4>
+                <p>Reproduzir som quando receber notificações</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" v-model="appSettings.soundNotifications">
+                <span class="slider"></span>
+              </label>
+            </div>
+            
+            <div class="setting-item">
+              <div class="setting-info">
+                <h4>Notificações de Mensagens</h4>
+                <p>Receber notificações de novas mensagens</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" v-model="appSettings.messageNotifications">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="setting-section">
+            <h4 class="section-title">Dados e Armazenamento</h4>
+            <div class="setting-item">
+              <div class="setting-info">
+                <h4>Download Automático</h4>
+                <p>Baixar automaticamente imagens e vídeos</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" v-model="appSettings.autoDownload">
+                <span class="slider"></span>
+              </label>
+            </div>
+            
+            <div class="setting-item">
+              <div class="setting-info">
+                <h4>Qualidade das Imagens</h4>
+                <p>Escolha a qualidade para economizar dados</p>
+              </div>
+              <select v-model="appSettings.imageQuality" class="setting-select">
+                <option value="high">Alta</option>
+                <option value="medium">Média</option>
+                <option value="low">Baixa</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="setting-section">
+            <h4 class="section-title">Sobre</h4>
+            <div class="about-info">
+              <div class="about-item">
+                <span>Versão do App:</span>
+                <span>1.0.0</span>
+              </div>
+              <div class="about-item">
+                <span>Última Atualização:</span>
+                <span>28 de Junho, 2025</span>
+              </div>
+            </div>
+            
+            <div class="setting-actions">
+              <button class="action-btn" @click="clearCache">
+                <IconComponent name="trash" :size="16" />
+                Limpar Cache
+              </button>
+              <button class="action-btn" @click="exportData">
+                <IconComponent name="download" :size="16" />
+                Exportar Dados
+              </button>
+              <button class="action-btn danger" @click="deleteAccount">
+                <IconComponent name="delete" :size="16" />
+                Excluir Conta
+              </button>
+            </div>
+          </div>
+          
+          <div class="modal-actions">
+            <button class="btn-save" @click="saveAppSettings">Salvar Configurações</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import IconComponent from './IconComponent.vue'
+import savedService from '@/services/savedService.js'
 
 export default {
   name: 'ProfileScreen',
@@ -237,7 +565,41 @@ export default {
       userPosts: [],
       savedPosts: [],
       userProjects: [],
-      userEvents: []
+      userEvents: [],
+      
+      // Novos dados para posts salvos integrados
+      actualSavedPosts: [],
+      savedFilter: 'all',
+      
+      // Menu de perfil e modais
+      showProfileMenu: false,
+      showPrivacyModal: false,
+      showBlockedModal: false,
+      showAppSettingsModal: false,
+      
+      // Configurações de privacidade
+      privacySettings: {
+        privateAccount: false,
+        hideOnlineStatus: false,
+        allowUnknownMessages: true,
+        showFollowers: true,
+        searchIndexing: false
+      },
+      
+      // Perfis bloqueados
+      blockedSearchQuery: '',
+      blockedUsers: [],
+      
+      // Configurações do app
+      appSettings: {
+        theme: 'auto',
+        fontSize: 'medium',
+        pushNotifications: true,
+        soundNotifications: true,
+        messageNotifications: true,
+        autoDownload: false,
+        imageQuality: 'medium'
+      }
     }
   },
   computed: {
@@ -272,10 +634,30 @@ export default {
         },
         links: savedProfile.links || []
       }
+    },
+
+    filteredBlockedUsers() {
+      if (!this.blockedSearchQuery) {
+        return this.blockedUsers
+      }
+
+      return this.blockedUsers.filter(user => 
+        user.name.toLowerCase().includes(this.blockedSearchQuery.toLowerCase()) ||
+        user.username.toLowerCase().includes(this.blockedSearchQuery.toLowerCase())
+      )
     }
   },
   mounted() {
     this.loadUserData()
+    this.updateSavedPosts()
+    
+    // Adicionar listener para fechar menu ao clicar fora
+    document.addEventListener('click', this.handleClickOutside)
+  },
+  
+  beforeUnmount() {
+    // Remover listener ao destruir componente
+    document.removeEventListener('click', this.handleClickOutside)
   },
   methods: {
     generateUsername(name) {
@@ -314,6 +696,38 @@ export default {
       
       // Carregar eventos do usuário (simulados)
       this.userEvents = this.generateUserEvents()
+      
+      // Carregar configurações salvas
+      this.loadSavedSettings()
+      
+      // Carregar usuários bloqueados
+      this.updateBlockedUsers()
+    },
+
+    loadSavedSettings() {
+      // Carregar configurações de privacidade
+      if (this.currentUser.privateAccount !== undefined) {
+        this.privacySettings.privateAccount = this.currentUser.privateAccount
+      }
+      if (this.currentUser.hideOnlineStatus !== undefined) {
+        this.privacySettings.hideOnlineStatus = this.currentUser.hideOnlineStatus
+      }
+      if (this.currentUser.allowUnknownMessages !== undefined) {
+        this.privacySettings.allowUnknownMessages = this.currentUser.allowUnknownMessages
+      }
+      if (this.currentUser.showFollowers !== undefined) {
+        this.privacySettings.showFollowers = this.currentUser.showFollowers
+      }
+      if (this.currentUser.searchIndexing !== undefined) {
+        this.privacySettings.searchIndexing = this.currentUser.searchIndexing
+      }
+
+      // Carregar configurações do app
+      const savedAppSettings = localStorage.getItem('ifwave_app_settings')
+      if (savedAppSettings) {
+        const settings = JSON.parse(savedAppSettings)
+        this.appSettings = { ...this.appSettings, ...settings }
+      }
     },
 
     generateUserPosts() {
@@ -521,9 +935,218 @@ export default {
     },
 
     logout() {
-      console.log('Logout')
-      this.showMenu = false
-    }
+      if (confirm('Tem certeza que deseja sair?')) {
+        // Limpar dados do usuário
+        localStorage.removeItem('ifwave_current_user')
+        localStorage.removeItem('ifwave_auth_token')
+        
+        // Fechar menu
+        this.showProfileMenu = false
+        
+        // Redirecionar para login
+        this.$router.push('/login')
+      }
+    },
+
+    // Métodos para posts salvos integrados
+    updateSavedPosts() {
+      this.actualSavedPosts = savedService.getSavedPostsByFilter(this.savedFilter)
+    },
+
+    removeSaved(postId) {
+      savedService.removeSavedPost(postId)
+      this.updateSavedPosts()
+    },
+
+    clearAllSaved() {
+      if (confirm('Tem certeza que deseja remover todos os posts salvos?')) {
+        savedService.clearAllSaved()
+        this.updateSavedPosts()
+      }
+    },
+
+    formatDate(dateString) {
+      if (!dateString) return ''
+      const date = new Date(dateString)
+      return date.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      })
+    },
+
+    openPrivacySettings() {
+      this.privacySettings = {
+        privateAccount: this.currentUser.privateAccount,
+        hideOnlineStatus: this.currentUser.hideOnlineStatus,
+        allowUnknownMessages: this.currentUser.allowUnknownMessages,
+        showFollowers: this.currentUser.showFollowers,
+        searchIndexing: this.currentUser.searchIndexing
+      }
+      this.showPrivacyModal = true
+    },
+
+    closePrivacyModal() {
+      this.showPrivacyModal = false
+    },
+
+    async savePrivacySettings() {
+      this.showPrivacyModal = false
+
+      // Simular salvamento
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      // Atualizar usuário atual no localStorage
+      const currentUser = JSON.parse(localStorage.getItem('ifwave_current_user'))
+      currentUser.privateAccount = this.privacySettings.privateAccount
+      currentUser.hideOnlineStatus = this.privacySettings.hideOnlineStatus
+      currentUser.allowUnknownMessages = this.privacySettings.allowUnknownMessages
+      currentUser.showFollowers = this.privacySettings.showFollowers
+      currentUser.searchIndexing = this.privacySettings.searchIndexing
+      localStorage.setItem('ifwave_current_user', JSON.stringify(currentUser))
+
+      // Atualizar perfil salvo
+      const profileKey = `ifwave_profile_${currentUser.id}`
+      const savedProfile = JSON.parse(localStorage.getItem(profileKey))
+      if (savedProfile) {
+        savedProfile.privateAccount = this.privacySettings.privateAccount
+        savedProfile.hideOnlineStatus = this.privacySettings.hideOnlineStatus
+        savedProfile.allowUnknownMessages = this.privacySettings.allowUnknownMessages
+        savedProfile.showFollowers = this.privacySettings.showFollowers
+        savedProfile.searchIndexing = this.privacySettings.searchIndexing
+        localStorage.setItem(profileKey, JSON.stringify(savedProfile))
+      }
+    },
+
+    openBlockedProfiles() {
+      this.showBlockedModal = true
+    },
+
+    closeBlockedModal() {
+      this.showBlockedModal = false
+    },
+
+    unblockUser(userId) {
+      if (confirm('Tem certeza que deseja desbloquear este usuário?')) {
+        // Simular remoção do bloqueio
+        setTimeout(() => {
+          const currentUser = JSON.parse(localStorage.getItem('ifwave_current_user'))
+          const blockedUsers = currentUser.blockedUsers.filter(user => user.id !== userId)
+          currentUser.blockedUsers = blockedUsers
+          localStorage.setItem('ifwave_current_user', JSON.stringify(currentUser))
+
+          // Forçar atualização da lista
+          this.updateBlockedUsers()
+        }, 500)
+      }
+    },
+
+    updateBlockedUsers() {
+      // Método para atualizar a lista de usuários bloqueados
+      const currentUser = JSON.parse(localStorage.getItem('ifwave_current_user'))
+      
+      // Se não há usuários bloqueados, criar alguns exemplos para demonstração
+      if (!currentUser.blockedUsers || currentUser.blockedUsers.length === 0) {
+        const exampleBlockedUsers = [
+          {
+            id: 'blocked1',
+            name: 'Usuário Spam',
+            username: 'usuario.spam',
+            avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+            blockedDate: new Date().toISOString()
+          },
+          {
+            id: 'blocked2', 
+            name: 'Perfil Fake',
+            username: 'perfil.fake',
+            avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80',
+            blockedDate: new Date(Date.now() - 86400000).toISOString() // 1 dia atrás
+          }
+        ]
+        
+        currentUser.blockedUsers = exampleBlockedUsers
+        localStorage.setItem('ifwave_current_user', JSON.stringify(currentUser))
+      }
+      
+      this.blockedUsers = currentUser.blockedUsers || []
+    },
+
+    openAppSettings() {
+      this.showAppSettingsModal = true
+    },
+
+    closeAppSettingsModal() {
+      this.showAppSettingsModal = false
+    },
+
+    async saveAppSettings() {
+      this.showAppSettingsModal = false
+
+      // Simular salvamento
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      // Atualizar configurações no localStorage
+      const appSettings = {
+        theme: this.appSettings.theme,
+        fontSize: this.appSettings.fontSize,
+        pushNotifications: this.appSettings.pushNotifications,
+        soundNotifications: this.appSettings.soundNotifications,
+        messageNotifications: this.appSettings.messageNotifications,
+        autoDownload: this.appSettings.autoDownload,
+        imageQuality: this.appSettings.imageQuality
+      }
+
+      localStorage.setItem('ifwave_app_settings', JSON.stringify(appSettings))
+    },
+
+    clearCache() {
+      if (confirm('Tem certeza que deseja limpar o cache do aplicativo?')) {
+        // Simular limpeza de cache
+        setTimeout(() => {
+          alert('Cache limpo com sucesso!')
+        }, 500)
+      }
+    },
+
+    exportData() {
+      // Lógica para exportar dados do usuário
+      const currentUser = JSON.parse(localStorage.getItem('ifwave_current_user'))
+      const userData = {
+        ...currentUser,
+        password: undefined // Não incluir senha na exportação
+      }
+
+      const dataStr = JSON.stringify(userData, null, 2)
+      const blob = new Blob([dataStr], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `dados_usuario_${currentUser.id}.json`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    },
+
+    deleteAccount() {
+      if (confirm('Tem certeza que deseja excluir sua conta? Esta ação é irreversível.')) {
+        // Simular exclusão de conta
+        setTimeout(() => {
+          alert('Conta excluída com sucesso!')
+          // Redirecionar para a tela de login ou homepage
+          this.$router.push('/login')
+        }, 500)
+      }
+    },
+
+    handleClickOutside(event) {
+      // Verificar se o clique foi fora do menu de perfil
+      const profileMenu = event.target.closest('.profile-menu')
+      if (!profileMenu && this.showProfileMenu) {
+        this.showProfileMenu = false
+      }
+    },
   }
 }
 </script>
@@ -672,6 +1295,10 @@ export default {
 .profile-header {
   padding: 20px 0;
   border-bottom: 1px solid var(--border);
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
 .profile-info {
@@ -846,23 +1473,148 @@ export default {
   padding: 16px 0;
 }
 
-.posts-grid,
-.saved-grid {
+.posts-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2px;
 }
 
-.post-item,
+.saved-grid {
+  padding: 0;
+}
+
+.saved-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 0 16px;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--foreground);
+  font-size: 14px;
+}
+
+.clear-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--special);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-btn:hover {
+  background: var(--special);
+  opacity: 0.8;
+}
+
+.saved-posts-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 16px;
+}
+
 .saved-item {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.saved-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.saved-content {
+  padding: 16px;
+}
+
+.saved-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.author-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.author-name {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.saved-text {
+  margin-bottom: 12px;
+  color: var(--foreground);
+  line-height: 1.4;
+}
+
+.saved-image {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.saved-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--foreground);
+}
+
+.saved-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--foreground);
+  opacity: 0.7;
+}
+
+.remove-saved-btn {
+  background: none;
+  border: none;
+  color: var(--special);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.remove-saved-btn:hover {
+  background: var(--background);
+}
+
+.post-item {
   position: relative;
   aspect-ratio: 1;
   overflow: hidden;
   cursor: pointer;
 }
 
-.post-item img,
-.saved-item img {
+.post-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -1075,6 +1827,327 @@ export default {
   color: #f57c00;
 }
 
+/* Modal de Configurações */
+.settings-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.settings-modal {
+  background: var(--card);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--special);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.close-btn:hover {
+  background: var(--background);
+}
+
+.modal-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.setting-section {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 16px;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.setting-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.setting-info h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.setting-info p {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  color: #8e8e8e;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  border-radius: 50%;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #0095f6;
+}
+
+input:checked + .slider:before {
+  transform: translateX(16px);
+}
+
+.setting-select {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--foreground);
+  font-size: 14px;
+}
+
+/* Bloqueados */
+.search-blocked {
+  margin-bottom: 16px;
+}
+
+.search-input-container {
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #8e8e8e;
+}
+
+.search-input {
+  padding: 12px 12px 12px 40px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--foreground);
+  font-size: 14px;
+  width: 100%;
+}
+
+.blocked-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.blocked-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  transition: transform 0.2s ease;
+}
+
+.blocked-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.blocked-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.blocked-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.blocked-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.blocked-name {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.blocked-username {
+  color: #8e8e8e;
+  font-size: 12px;
+}
+
+.blocked-date {
+  color: #8e8e8e;
+  font-size: 11px;
+}
+
+.unblock-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #ff4d4d;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.unblock-btn:hover {
+  background: #e60000;
+}
+
+/* Menu de Perfil */
+.profile-menu {
+  position: relative;
+  flex-shrink: 0;
+  margin-top: 8px;
+}
+
+.menu-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--foreground);
+  transition: background-color 0.2s ease;
+}
+
+.menu-btn:hover {
+  background: var(--border);
+}
+
+.profile-menu-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  z-index: 1000;
+  padding: 8px 0;
+}
+
+.menu-item {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  color: var(--foreground);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.menu-item:hover {
+  background: var(--border);
+}
+
+.menu-item.danger {
+  color: #ff4757;
+}
+
+.menu-item.danger:hover {
+  background: rgba(255, 71, 87, 0.1);
+}
+
+.menu-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 0;
+}
+
+/* Responsividade */
 @media (max-width: 480px) {
   .profile-container {
     padding: 0 12px;

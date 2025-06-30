@@ -618,7 +618,20 @@ export default {
       }
 
       // Buscar perfil salvo ou criar um novo
-      const savedProfile = JSON.parse(localStorage.getItem(`ifwave_profile_${this.currentUser.id}`) || '{}')
+      let savedProfile = JSON.parse(localStorage.getItem(`ifwave_profile_${this.currentUser.id}`) || '{}')
+      
+      // Se não há avatar salvo, gerar um consistente baseado no ID do usuário
+      if (!savedProfile.avatar) {
+        savedProfile.avatar = this.generateConsistentAvatar(this.currentUser.id)
+        
+        // Se não há stats salvos, gerar stats consistentes baseados no ID
+        if (!savedProfile.stats) {
+          savedProfile.stats = this.generateConsistentStats(this.currentUser.id)
+        }
+        
+        // Salvar o perfil com os dados gerados para manter consistência
+        localStorage.setItem(`ifwave_profile_${this.currentUser.id}`, JSON.stringify(savedProfile))
+      }
       
       return {
         name: this.currentUser.name,
@@ -626,12 +639,8 @@ export default {
         course: this.currentUser.course,
         campus: this.currentUser.campus,
         bio: savedProfile.bio || '',
-        avatar: savedProfile.avatar || this.generateAvatar(),
-        stats: savedProfile.stats || { 
-          posts: Math.floor(Math.random() * 10), 
-          followers: Math.floor(Math.random() * 50) + 10, 
-          following: Math.floor(Math.random() * 30) + 5 
-        },
+        avatar: savedProfile.avatar,
+        stats: savedProfile.stats || this.generateConsistentStats(this.currentUser.id),
         links: savedProfile.links || []
       }
     },
@@ -645,6 +654,18 @@ export default {
         user.name.toLowerCase().includes(this.blockedSearchQuery.toLowerCase()) ||
         user.username.toLowerCase().includes(this.blockedSearchQuery.toLowerCase())
       )
+    }
+  },
+  watch: {
+    currentUser: {
+      handler(newUser, oldUser) {
+        // Só recarregar dados se o usuário realmente mudou
+        if (newUser && (!oldUser || newUser.id !== oldUser.id)) {
+          this.loadUserData()
+          this.updateSavedPosts()
+        }
+      },
+      immediate: false
     }
   },
   mounted() {
@@ -682,20 +703,90 @@ export default {
       return avatars[Math.floor(Math.random() * avatars.length)]
     },
 
+    generateConsistentAvatar(userId) {
+      const avatars = [
+        'https://images.unsplash.com/photo-1494790108755-2616b612b750?auto=format&fit=crop&w=150&q=80',
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
+        'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80',
+        'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=150&q=80'
+      ]
+      
+      // Usar uma função hash simples baseada no userId para garantir consistência
+      let hash = 0
+      const str = userId.toString()
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i)
+        hash = ((hash << 5) - hash) + char
+        hash = hash & hash // Convert to 32bit integer
+      }
+      
+      const index = Math.abs(hash) % avatars.length
+      return avatars[index]
+    },
+
+    generateConsistentStats(userId) {
+      // Usar uma função hash simples baseada no userId para gerar stats consistentes
+      let hash = 0
+      const str = userId.toString()
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i)
+        hash = ((hash << 5) - hash) + char
+        hash = hash & hash // Convert to 32bit integer
+      }
+      
+      // Usar o hash para gerar números consistentes
+      const absHash = Math.abs(hash)
+      
+      return {
+        posts: (absHash % 10) + 1, // 1-10 posts
+        followers: (absHash % 50) + 10, // 10-59 followers
+        following: ((absHash * 7) % 30) + 5 // 5-34 following
+      }
+    },
+
+    getHashFromUserId(userId) {
+      // Função helper para gerar hash consistente do userId
+      let hash = 0
+      const str = userId.toString()
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i)
+        hash = ((hash << 5) - hash) + char
+        hash = hash & hash // Convert to 32bit integer
+      }
+      return Math.abs(hash)
+    },
+
     loadUserData() {
       if (!this.currentUser) return
 
-      // Carregar posts do usuário (simulados)
-      this.userPosts = this.generateUserPosts()
+      // Verificar se os dados já foram carregados para este usuário
+      const dataKey = `ifwave_user_data_${this.currentUser.id}`
+      const savedUserData = localStorage.getItem(dataKey)
       
-      // Carregar posts salvos (simulados)
-      this.savedPosts = this.generateSavedPosts()
-      
-      // Carregar projetos do usuário (simulados)
-      this.userProjects = this.generateUserProjects()
-      
-      // Carregar eventos do usuário (simulados)
-      this.userEvents = this.generateUserEvents()
+      if (savedUserData) {
+        // Se já há dados salvos, carregá-los
+        const userData = JSON.parse(savedUserData)
+        this.userPosts = userData.userPosts || []
+        this.savedPosts = userData.savedPosts || []
+        this.userProjects = userData.userProjects || []
+        this.userEvents = userData.userEvents || []
+      } else {
+        // Se não há dados salvos, gerar novos dados consistentes
+        this.userPosts = this.generateUserPosts()
+        this.savedPosts = this.generateSavedPosts()
+        this.userProjects = this.generateUserProjects()
+        this.userEvents = this.generateUserEvents()
+        
+        // Salvar os dados gerados para manter consistência
+        const userData = {
+          userPosts: this.userPosts,
+          savedPosts: this.savedPosts,
+          userProjects: this.userProjects,
+          userEvents: this.userEvents,
+          generatedAt: new Date().toISOString()
+        }
+        localStorage.setItem(dataKey, JSON.stringify(userData))
+      }
       
       // Carregar configurações salvas
       this.loadSavedSettings()
@@ -731,28 +822,40 @@ export default {
     },
 
     generateUserPosts() {
+      if (!this.currentUser) return []
+      
       const postImages = [
         'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?auto=format&fit=crop&w=300&q=80',
         'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=300&q=80',
         'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=300&q=80'
       ]
       
-      return Array.from({ length: Math.floor(Math.random() * 6) }, (_, i) => ({
+      // Gerar número consistente de posts baseado no ID do usuário
+      const hash = this.getHashFromUserId(this.currentUser.id)
+      const postCount = (hash % 6) + 1 // 1-6 posts
+      
+      return Array.from({ length: postCount }, (_, i) => ({
         id: i + 1,
         image: postImages[i % postImages.length],
         caption: `Post ${i + 1}`,
-        likes: Math.floor(Math.random() * 100) + 10,
-        comments: Math.floor(Math.random() * 20) + 2
+        likes: ((hash * (i + 1)) % 100) + 10,
+        comments: ((hash * (i + 2)) % 20) + 2
       }))
     },
 
     generateSavedPosts() {
+      if (!this.currentUser) return []
+      
       const savedImages = [
         'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=300&q=80',
         'https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=300&q=80'
       ]
       
-      return Array.from({ length: Math.floor(Math.random() * 4) }, (_, i) => ({
+      // Gerar número consistente de posts salvos baseado no ID do usuário
+      const hash = this.getHashFromUserId(this.currentUser.id)
+      const savedCount = (hash % 4) + 1 // 1-4 posts salvos
+      
+      return Array.from({ length: savedCount }, (_, i) => ({
         id: i + 1,
         image: savedImages[i % savedImages.length],
         title: `Post salvo ${i + 1}`
@@ -760,6 +863,8 @@ export default {
     },
 
     generateUserProjects() {
+      if (!this.currentUser) return []
+      
       const projectImages = [
         'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=300&q=80',
         'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=300&q=80',
@@ -782,7 +887,11 @@ export default {
         ['React', 'Express', 'MongoDB']
       ]
       
-      return Array.from({ length: Math.floor(Math.random() * 4) + 1 }, (_, i) => ({
+      // Gerar número consistente de projetos baseado no ID do usuário
+      const hash = this.getHashFromUserId(this.currentUser.id)
+      const projectCount = (hash % 4) + 1 // 1-4 projetos
+      
+      return Array.from({ length: projectCount }, (_, i) => ({
         id: i + 1,
         title: projectTitles[i % projectTitles.length],
         description: `Projeto desenvolvido durante o ${i + 1}º semestre`,
@@ -793,6 +902,8 @@ export default {
     },
 
     generateUserEvents() {
+      if (!this.currentUser) return []
+      
       const eventTitles = [
         'Feira de Ciências IFMT',
         'Workshop de Git/GitHub',
@@ -810,7 +921,11 @@ export default {
         'Pátio Central'
       ]
       
-      return Array.from({ length: Math.floor(Math.random() * 3) + 1 }, (_, i) => ({
+      // Gerar número consistente de eventos baseado no ID do usuário
+      const hash = this.getHashFromUserId(this.currentUser.id)
+      const eventCount = (hash % 3) + 1 // 1-3 eventos
+      
+      return Array.from({ length: eventCount }, (_, i) => ({
         id: i + 1,
         title: eventTitles[i % eventTitles.length],
         description: `Evento educacional do IFMT`,

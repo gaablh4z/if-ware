@@ -627,7 +627,14 @@ export default {
   font-size: 12px;
 }
 
-/* Responsividade */
+/* Responsividade Avançada */
+@media (max-width: 1024px) {
+  .stories-container {
+    max-width: 90%;
+    max-height: 90%;
+  }
+}
+
 @media (max-width: 768px) {
   .stories-overlay {
     padding: 0;
@@ -637,6 +644,236 @@ export default {
     width: 100vw;
     height: 100vh;
     border-radius: 0;
+    max-width: none;
+    max-height: none;
+  }
+  
+  .story-header {
+    padding: 12px 16px;
+    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.3);
+  }
+  
+  .user-info {
+    gap: 10px;
+  }
+  
+  .story-avatar {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .user-details h4 {
+    font-size: 14px;
+  }
+  
+  .story-time {
+    font-size: 12px;
+  }
+  
+  .close-stories {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+  
+  .story-content {
+    height: calc(100vh - 140px);
+  }
+  
+  .story-image,
+  .story-video {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+  
+  .story-text-overlay {
+    padding: 20px;
+    font-size: 16px;
+  }
+  
+  .story-controls {
+    padding: 16px;
+    gap: 12px;
+  }
+  
+  .nav-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+  }
+  
+  .story-input {
+    font-size: 16px; /* Evita zoom no iOS */
+    padding: 12px 50px 12px 16px;
+  }
+  
+  .send-reply {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .progress-bars {
+    padding: 0 16px;
+    gap: 3px;
+  }
+  
+  .progress-bar {
+    height: 3px;
+  }
+  
+  .viewers-overlay {
+    border-radius: 16px 16px 0 0;
+    padding: 16px;
+    max-height: 60%;
+  }
+  
+  .viewers-list {
+    gap: 12px;
+  }
+  
+  .viewer-item {
+    padding: 8px 0;
+  }
+  
+  .viewer-avatar {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .viewed-time {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .story-header {
+    padding: 10px 12px;
+  }
+  
+  .story-avatar {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .user-details h4 {
+    font-size: 13px;
+  }
+  
+  .story-time {
+    font-size: 11px;
+  }
+  
+  .close-stories {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+  
+  .story-content {
+    height: calc(100vh - 120px);
+  }
+  
+  .story-text-overlay {
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  
+  .story-controls {
+    padding: 12px;
+    gap: 8px;
+  }
+  
+  .nav-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+  
+  .story-input {
+    font-size: 16px;
+    padding: 10px 45px 10px 12px;
+    border-radius: 20px;
+  }
+  
+  .send-reply {
+    width: 36px;
+    height: 36px;
+    right: 6px;
+  }
+  
+  .progress-bars {
+    padding: 0 12px;
+    gap: 2px;
+  }
+  
+  .progress-bar {
+    height: 2px;
+    border-radius: 1px;
+  }
+  
+  .viewers-overlay {
+    padding: 12px;
+    max-height: 50%;
+  }
+  
+  .viewers-overlay h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+  
+  .viewer-item {
+    gap: 8px;
+    padding: 6px 0;
+  }
+  
+  .viewer-avatar {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .viewer-item span {
+    font-size: 13px;
+  }
+  
+  .viewed-time {
+    font-size: 10px;
+  }
+}
+
+/* Otimizações para toque */
+@media (hover: none) and (pointer: coarse) {
+  .nav-btn,
+  .close-stories,
+  .send-reply {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .viewer-item {
+    min-height: 44px;
+    align-items: center;
+  }
+}
+
+/* Modo paisagem */
+@media (max-width: 768px) and (orientation: landscape) {
+  .story-content {
+    height: calc(100vh - 100px);
+  }
+  
+  .story-header {
+    padding: 8px 16px;
+  }
+  
+  .story-controls {
+    padding: 8px 16px;
+  }
+  
+  .viewers-overlay {
+    max-height: 70%;
   }
   
   .story-text {

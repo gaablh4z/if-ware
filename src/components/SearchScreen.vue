@@ -814,22 +814,220 @@ export default {
   font-size: 0.9em;
 }
 
+/* Responsividade Avançada */
+@media (max-width: 1024px) {
+  .search-container {
+    max-width: 100%;
+    padding: clamp(16px, 4vw, 24px);
+  }
+  
+  .suggestions-grid,
+  .people-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   .search-container {
-    padding: 15px;
+    padding: 12px;
+  }
+  
+  .search-header h2 {
+    font-size: clamp(1.5rem, 5vw, 1.8rem);
+  }
+  
+  .search-input {
+    font-size: 16px; /* Evita zoom no iOS */
+    padding: 16px 16px 16px 50px;
   }
   
   .search-filters {
     justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .search-filters::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .filter-btn {
+    white-space: nowrap;
+    min-width: max-content;
+    padding: 10px 16px;
+    font-size: 14px;
   }
   
   .person-card {
     flex-direction: column;
     text-align: center;
+    padding: 16px;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .person-avatar img {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .person-info {
+    order: 2;
+  }
+  
+  .person-actions {
+    order: 3;
+    width: 100%;
+  }
+  
+  .follow-btn,
+  .suggestion-follow-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
   }
   
   .hashtags-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  
+  .hashtag-card {
+    padding: 12px;
+  }
+  
+  .hashtag-name {
+    font-size: 14px;
+  }
+  
+  .hashtag-count {
+    font-size: 12px;
+  }
+  
+  .post-card {
+    padding: 12px;
+  }
+  
+  .post-header {
+    gap: 8px;
+  }
+  
+  .post-avatar img {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .post-category {
+    padding: 3px 6px;
+    font-size: 11px;
+  }
+  
+  .post-content {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  
+  .post-stats {
+    gap: 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-container {
+    padding: 8px;
+  }
+  
+  .search-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .search-header h2 {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+  
+  .search-header p {
+    font-size: 14px;
+  }
+  
+  .search-input-container {
+    margin-bottom: 16px;
+  }
+  
+  .search-input {
+    padding: 14px 14px 14px 45px;
+    border-radius: 20px;
+  }
+  
+  .search-icon {
+    left: 12px;
+    width: 18px;
+    height: 18px;
+  }
+  
+  .clear-btn {
+    right: 12px;
+    width: 24px;
+    height: 24px;
+  }
+  
+  .suggestions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .people-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .suggestion-card,
+  .person-card {
+    border-radius: 12px;
+    padding: 16px;
+  }
+  
+  .suggestion-avatar img,
+  .person-avatar img {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .hashtags-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .course-card {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .course-icon {
+    font-size: 1.5em;
+  }
+  
+  .no-results {
+    padding: 60px 20px;
+  }
+  
+  .no-results-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+  }
+  
+  .no-results h3 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+  
+  .no-results p {
+    font-size: 14px;
+    line-height: 1.5;
   }
 }
 </style>

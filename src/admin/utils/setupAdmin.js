@@ -25,7 +25,7 @@ export function createAdminUser() {
     isActive: true,
     emailVerified: true,
     preferences: {
-      theme: 'light',
+      // theme removido
       notifications: true,
       privacy: 'public'
     },
@@ -84,7 +84,7 @@ export function createSampleData() {
         avatar: null,
         emailVerified: true,
         preferences: {
-          theme: 'light',
+          // theme removido
           notifications: true,
           privacy: 'public'
         },

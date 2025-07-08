@@ -2,10 +2,12 @@
   <div class="post">
     <!-- Header do post -->
     <div class="post-header">
-      <span class="avatar">{{ user.charAt(0).toUpperCase() }}</span>
-      <div class="user-info">
-        <span class="username">{{ user }}</span>
-        <span v-if="location" class="location">{{ location }}</span>
+      <div class="user-section">
+        <span class="avatar">{{ user.charAt(0).toUpperCase() }}</span>
+        <div class="user-info">
+          <span class="username">{{ user }}</span>
+          <span v-if="location" class="location">{{ location }}</span>
+        </div>
       </div>
       <div class="post-time">{{ formatTime(timestamp) }}</div>
     </div>
@@ -357,24 +359,36 @@ export default {
 <style scoped>
 .post {
   border: 1px solid #dbdbdb;
-  border-radius: 8px;
+  border-radius: 12px;
   margin-bottom: 24px;
   background: #fff;
   box-sizing: border-box;
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+}
+
+.post:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Header */
 .post-header {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  padding: 16px 20px;
   justify-content: space-between;
 }
 
+.user-section {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
 .avatar {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045);
   border-radius: 50%;
   display: flex;
@@ -382,8 +396,9 @@ export default {
   justify-content: center;
   color: #fff;
   font-weight: bold;
-  margin-right: 12px;
+  margin-right: 16px;
   flex-shrink: 0;
+  font-size: 16px;
 }
 
 .user-info {
@@ -395,18 +410,18 @@ export default {
 .username {
   font-weight: 600;
   color: #262626;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.2;
 }
 
 .location {
-  font-size: 12px;
+  font-size: 13px;
   color: #8e8e8e;
   margin-top: 2px;
 }
 
 .post-time {
-  font-size: 12px;
+  font-size: 13px;
   color: #8e8e8e;
 }
 
@@ -415,7 +430,7 @@ export default {
   width: 100%;
   display: block;
   margin: 0;
-  max-height: 400px;
+  max-height: 600px;
   object-fit: cover;
   background-color: #fafafa;
 }
@@ -424,8 +439,8 @@ export default {
 .post-actions {
   display: flex;
   align-items: center;
-  padding: 8px 16px;
-  gap: 16px;
+  padding: 12px 20px;
+  gap: 20px;
 }
 
 .action-button {
@@ -452,7 +467,7 @@ export default {
 }
 
 .action-button span {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   margin-left: 4px;
 }
@@ -475,8 +490,8 @@ export default {
 
 /* Caption */
 .post-caption {
-  padding: 0 16px 12px;
-  font-size: 14px;
+  padding: 0 20px 16px;
+  font-size: 15px;
   line-height: 1.4;
 }
 
@@ -507,14 +522,14 @@ export default {
 /* Comentários */
 .comments-section {
   border-top: 1px solid #efefef;
-  padding: 16px;
+  padding: 16px 20px;
 }
 
 .comment {
   display: flex;
   align-items: flex-start;
   margin-bottom: 12px;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.4;
 }
 
@@ -532,7 +547,7 @@ export default {
 }
 
 .comment-time {
-  font-size: 12px;
+  font-size: 13px;
   color: #8e8e8e;
   margin-left: 12px;
   flex-shrink: 0;
@@ -556,7 +571,7 @@ export default {
 .comment-input {
   display: flex;
   align-items: center;
-  padding: 16px;
+  padding: 16px 20px;
   border-top: 1px solid #efefef;
   gap: 12px;
 }
@@ -565,7 +580,7 @@ export default {
   flex: 1;
   border: none;
   outline: none;
-  font-size: 14px;
+  font-size: 15px;
   color: #262626;
   background: transparent;
   resize: none;
@@ -580,7 +595,7 @@ export default {
   border: none;
   color: #0095f6;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   padding: 8px;
   border-radius: 4px;
@@ -596,63 +611,224 @@ export default {
   cursor: not-allowed;
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
+/* Responsividade para mobile */
+@media (max-width: 767px) {
   .post {
     border-radius: 0;
-    margin-bottom: 16px;
+    margin-bottom: 0;
     border-left: none;
     border-right: none;
+    border-top: none;
   }
   
   .post-header {
-    padding: 12px;
+    padding: 12px 16px;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    margin-right: 12px;
+    font-size: 14px;
+  }
+  
+  .username {
+    font-size: 14px;
+  }
+
+  .location {
+    font-size: 12px;
+  }
+
+  .post-time {
+    font-size: 12px;
   }
   
   .post-image {
-    max-height: 300px;
+    max-height: 400px;
   }
   
   .post-actions {
-    padding: 6px 12px;
-    gap: 12px;
+    padding: 8px 16px;
+    gap: 16px;
   }
   
   .action-button {
-    font-size: 20px;
+    font-size: 22px;
     padding: 6px;
+  }
+
+  .action-button span {
+    font-size: 12px;
   }
   
   .post-caption {
-    padding: 0 12px 8px;
-    font-size: 13px;
+    padding: 0 16px 12px;
+    font-size: 14px;
   }
   
   .comments-section {
-    padding: 12px;
+    padding: 12px 16px;
   }
   
   .comment-input {
-    padding: 12px;
+    padding: 12px 16px;
+  }
+
+  .comment-field {
+    font-size: 14px;
+  }
+
+  .comment-submit {
+    font-size: 14px;
   }
 }
 
-@media (max-width: 480px) {
+/* Tablets */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .post {
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  .post-header {
+    padding: 14px 18px;
+  }
+
   .post-actions {
-    gap: 8px;
+    padding: 10px 18px;
+    gap: 18px;
   }
-  
-  .action-button {
-    font-size: 18px;
-    padding: 4px;
+
+  .post-caption {
+    padding: 0 18px 14px;
   }
-  
-  .action-button span {
-    font-size: 11px;
+
+  .comments-section {
+    padding: 14px 18px;
+  }
+
+  .comment-input {
+    padding: 14px 18px;
   }
 }
 
-/* Animações */
+/* Desktop - layout otimizado para tela inteira */
+@media (min-width: 1024px) {
+  .post {
+    max-width: none; /* Remove limitação de largura */
+    margin-bottom: 30px;
+    border-radius: 16px;
+  }
+
+  .post-header {
+    padding: 20px 24px;
+  }
+
+  .avatar {
+    width: 44px;
+    height: 44px;
+    margin-right: 16px;
+    font-size: 18px;
+  }
+
+  .username {
+    font-size: 16px;
+  }
+
+  .location {
+    font-size: 14px;
+  }
+
+  .post-time {
+    font-size: 14px;
+  }
+
+  .post-image {
+    max-height: 800px; /* Maior em desktop */
+  }
+
+  .post-actions {
+    padding: 16px 24px;
+    gap: 24px;
+  }
+
+  .action-button {
+    font-size: 26px;
+    padding: 10px;
+  }
+
+  .action-button span {
+    font-size: 14px;
+  }
+
+  .post-caption {
+    padding: 0 24px 20px;
+    font-size: 16px;
+  }
+
+  .comments-section {
+    padding: 20px 24px;
+  }
+
+  .comment {
+    font-size: 16px;
+  }
+
+  .comment-input {
+    padding: 20px 24px;
+  }
+
+  .comment-field {
+    font-size: 16px;
+  }
+
+  .comment-submit {
+    font-size: 16px;
+  }
+}
+
+/* Ultra wide screens */
+@media (min-width: 1400px) {
+  .post {
+    margin-bottom: 40px;
+    border-radius: 20px;
+  }
+
+  .post-header {
+    padding: 24px 32px;
+  }
+
+  .avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .post-actions {
+    padding: 20px 32px;
+    gap: 28px;
+  }
+
+  .action-button {
+    font-size: 28px;
+  }
+
+  .post-caption {
+    padding: 0 32px 24px;
+    font-size: 17px;
+  }
+
+  .comments-section {
+    padding: 24px 32px;
+  }
+
+  .comment-input {
+    padding: 24px 32px;
+  }
+}
+
+/* Animações e transições especiais */
 @keyframes likeAnimation {
   0% { transform: scale(1); }
   50% { transform: scale(1.2); }
@@ -666,7 +842,7 @@ export default {
 /* Estados especiais */
 .post.highlighted {
   border-color: #0095f6;
-  box-shadow: 0 0 0 1px #0095f6;
+  box-shadow: 0 0 0 2px rgba(0, 149, 246, 0.2);
 }
 
 .post.saved-post {
@@ -677,5 +853,23 @@ export default {
 .post-image[src=""],
 .post-image:not([src]) {
   display: none;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .post {
+    background: var(--card);
+    border-color: var(--border);
+  }
+
+  .username,
+  .caption-text,
+  .comment-text {
+    color: var(--foreground);
+  }
+
+  .post-image {
+    background-color: #2a2a2a;
+  }
 }
 </style>

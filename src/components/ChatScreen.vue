@@ -1192,20 +1192,152 @@ export default {
   color: #e74c3c;
 }
 
-@media (max-width: 480px) {
-  .user-info-content {
-    width: 280px;
+/* Responsividade Avançada */
+@media (max-width: 768px) {
+  .chat-container {
+    height: 100vh;
+    border-radius: 0;
+  }
+  
+  .chat-header {
+    padding: 12px 16px;
+    border-radius: 0;
+  }
+  
+  .chat-avatar {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .user-name {
+    font-size: 16px;
+  }
+  
+  .user-status {
+    font-size: 12px;
+  }
+  
+  .messages-area {
+    padding: 12px 16px 80px;
   }
   
   .message-bubble {
     max-width: 85%;
+    padding: 12px 16px;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+  
+  .message-time {
+    font-size: 11px;
+  }
+  
+  .message-input-area {
+    padding: 12px 16px;
+    border-radius: 0;
+  }
+  
+  .message-input {
+    font-size: 16px; /* Evita zoom no iOS */
+    padding: 12px 60px 12px 16px;
+    min-height: 20px;
+  }
+  
+  .attachment-btn,
+  .emoji-btn,
+  .send-btn,
+  .voice-btn {
+    width: 40px;
+    height: 40px;
+    padding: 8px;
   }
   
   .emoji-picker {
-    width: 280px;
-    height: 250px;
+    width: calc(100vw - 32px);
+    height: 280px;
+    bottom: 80px;
+    left: 16px;
+    right: 16px;
+  }
+  
+  .emoji-grid {
+    grid-template-columns: repeat(8, 1fr);
+    height: 200px;
+  }
+  
+  .emoji-item {
+    padding: 8px;
+    font-size: 18px;
+  }
+  
+  .attachment-options {
+    grid-template-columns: repeat(2, 1fr);
+    margin: 12px 16px;
+    gap: 12px;
+  }
+  
+  .attachment-option {
+    padding: 16px;
+    border-radius: 12px;
+  }
+  
+  .voice-recording-indicator {
+    margin: 12px 16px;
+    padding: 16px;
+    border-radius: 12px;
+  }
+  
+  .recording-time {
+    font-size: 18px;
+  }
+  
+  .recording-actions {
+    gap: 16px;
+  }
+  
+  .recording-actions button {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-info-content {
+    width: calc(100vw - 32px);
+    margin: 16px;
+    max-height: calc(100vh - 32px);
+  }
+  
+  .profile-avatar {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .user-profile h3 {
+    font-size: 18px;
+  }
+  
+  .user-profile p {
+    font-size: 13px;
+  }
+  
+  .action-item {
+    padding: 16px 12px;
+    font-size: 15px;
+  }
+  
+  .message-bubble {
+    max-width: 90%;
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+  
+  .emoji-picker {
+    width: calc(100vw - 16px);
+    left: 8px;
+    right: 8px;
     bottom: 70px;
-    right: 10px;
   }
   
   .emoji-grid {
@@ -1213,14 +1345,89 @@ export default {
     height: 180px;
   }
   
+  .emoji-item {
+    padding: 6px;
+    font-size: 16px;
+  }
+  
   .attachment-options {
     grid-template-columns: 1fr;
-    margin: 8px 10px;
+    margin: 8px 12px;
+  }
+  
+  .attachment-option {
+    padding: 12px;
+    text-align: center;
+  }
+  
+  .attachment-option svg {
+    width: 20px;
+    height: 20px;
   }
   
   .voice-recording-indicator {
-    margin: 8px 10px;
-    padding: 10px 15px;
+    margin: 8px 12px;
+    padding: 12px 16px;
+  }
+  
+  .recording-time {
+    font-size: 16px;
+  }
+  
+  .recording-actions button {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+  
+  .typing-indicator {
+    margin: 0 16px 12px;
+  }
+  
+  .typing-bubble {
+    padding: 8px 12px;
+  }
+  
+  .typing-dots span {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* Modo paisagem em dispositivos pequenos */
+@media (max-width: 768px) and (orientation: landscape) {
+  .emoji-picker {
+    height: 200px;
+    bottom: 60px;
+  }
+  
+  .emoji-grid {
+    height: 120px;
+  }
+  
+  .user-info-content {
+    max-height: calc(100vh - 16px);
+  }
+}
+
+/* Melhorias para toque */
+@media (hover: none) and (pointer: coarse) {
+  .action-btn,
+  .attachment-btn,
+  .emoji-btn,
+  .send-btn,
+  .voice-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .emoji-item {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .attachment-option {
+    min-height: 60px;
   }
 }
 </style>

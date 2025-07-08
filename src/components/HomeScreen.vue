@@ -208,17 +208,18 @@ export default {
 
 <style scoped>
 .home-screen {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
+  width: 100%;
+  padding: 0;
 }
 
 .feed-section {
-  margin-top: 20px;
+  width: 100%;
+  margin-top: 0;
 }
 
 .poll-container {
   margin-bottom: 20px;
+  width: 100%;
 }
 
 .list-enter-active, .list-leave-active {
@@ -233,9 +234,37 @@ export default {
   transform: translateY(-20px);
 }
 
-@media (max-width: 768px) {
+/* Mobile */
+@media (max-width: 767px) {
   .home-screen {
-    padding: 10px;
+    padding: 0;
+  }
+}
+
+/* Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .home-screen {
+    padding: 0 20px;
+  }
+}
+
+/* Desktop - aproveita toda a largura */
+@media (min-width: 1024px) {
+  .home-screen {
+    padding: 0;
+  }
+  
+  .feed-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+/* Large desktop - layout ainda mais otimizado */
+@media (min-width: 1400px) {
+  .feed-section {
+    gap: 24px;
   }
 }
 </style>

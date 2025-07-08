@@ -661,25 +661,213 @@ export default {
   100% { transform: rotate(360deg); }
 }
 
-/* Responsivo */
+/* Responsividade Avançada */
+@media (max-width: 1024px) {
+  .saved-posts-screen {
+    max-width: 100%;
+    padding: clamp(12px, 3vw, 20px);
+  }
+  
+  .statistics {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   .saved-posts-screen {
-    padding: 0.5rem;
+    padding: 12px;
   }
 
   .header-actions {
     flex-direction: column;
     align-items: stretch;
+    gap: 12px;
+  }
+  
+  .filter-select {
+    width: 100%;
+    font-size: 16px; /* Evita zoom no iOS */
+    padding: 12px 16px;
+  }
+  
+  .action-buttons {
+    justify-content: center;
+  }
+  
+  .action-btn {
+    padding: 12px;
+    border-radius: 8px;
   }
 
   .statistics {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  
+  .stat-card {
+    padding: 16px;
+  }
+  
+  .stat-value {
+    font-size: 1.3rem;
+  }
+  
+  .stat-label {
+    font-size: 11px;
   }
 
   .post-meta {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.5rem;
+    gap: 8px;
+  }
+  
+  .saved-date {
+    font-size: 12px;
+  }
+  
+  .post-stats {
+    gap: 12px;
+  }
+  
+  .saved-post-card {
+    margin: 0 -12px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+  
+  .post-content {
+    padding: 16px;
+  }
+  
+  .post-header {
+    margin-bottom: 12px;
+  }
+  
+  .post-text {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  .post-image img {
+    height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .saved-posts-screen {
+    padding: 8px;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .header-icon {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .subtitle {
+    font-size: 14px;
+  }
+  
+  .header-actions {
+    margin-top: 16px;
+  }
+  
+  .statistics {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .stat-card {
+    padding: 12px;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+  
+  .stat-label {
+    font-size: 12px;
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: 500;
+  }
+  
+  .empty-state {
+    padding: 60px 16px;
+  }
+  
+  .empty-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 20px;
+  }
+  
+  .cta-button {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+  }
+  
+  .modal {
+    margin: 20px;
+    padding: 24px;
+    max-width: calc(100vw - 40px);
+  }
+  
+  .modal h3 {
+    font-size: 1.2rem;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .btn-secondary,
+  .btn-danger {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+  }
+  
+  .post-author {
+    gap: 8px;
+  }
+  
+  .post-author img {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .author-name {
+    font-size: 13px;
+  }
+  
+  .post-date {
+    font-size: 11px;
+  }
+  
+  .loading-state {
+    padding: 60px 16px;
+  }
+  
+  .spinner {
+    width: 32px;
+    height: 32px;
   }
 }
 </style>

@@ -1,79 +1,22 @@
 <template>
   <div class="feed-container">
-    <header class="feed-header">
-      <span class="logo">Velo</span>
-      <div class="header-controls">
-        <ThemeSelector :expandable="true" />
-        <span
-          v-if="currentTab !== 'profile' && currentTab !== 'notifications'"
-          class="notification-icon"
-          title="Notificações"
-          @click="currentTab = 'notifications'"
-        >
-          <img 
-            :src="require('@/assets/icons/notifications.svg')" 
-            alt="Notificações"
-            width="28" 
-            height="28" 
-            style="object-fit: contain; filter: currentColor;"
+    <!-- Conteúdo principal simplificado -->
+    <main class="main-content">
+      <transition name="fade" mode="out-in">
+        <div :key="currentTab" class="content-wrapper">
+          <HomeScreen v-if="currentTab === 'home'" :posts="posts" :current-user="currentUser" />
+          <SearchScreen v-else-if="currentTab === 'search'" />
+          <PublishScreen v-else-if="currentTab === 'publish'" />
+          <MessagesScreen v-else-if="currentTab === 'messages'" :current-user="currentUser" />
+          <ProfileScreen v-else-if="currentTab === 'profile'" :current-user="currentUser" />
+          <NotificationsScreen 
+            v-else-if="currentTab === 'notifications'" 
+            :notifications="notificacoes" 
+            @back="goBack" 
           />
-          <span
-            v-if="notificacoesNaoLidas > 0"
-            class="badge"
-            :class="{
-              urgente: notificacaoUrgente,
-              positiva: notificacaoPositiva
-            }"
-          >{{ notificacoesNaoLidas }}</span>
-        </span>
-      </div>
-    </header>
-    <transition name="fade" mode="out-in">
-      <main :key="currentTab" :class="{ 'no-navbar': currentTab === 'notifications' }">
-        <HomeScreen v-if="currentTab === 'home'" :posts="posts" :current-user="currentUser" />
-        <SearchScreen v-else-if="currentTab === 'search'" />
-        <PublishScreen v-else-if="currentTab === 'publish'" />
-        <MessagesScreen v-else-if="currentTab === 'messages'" :current-user="currentUser" />
-        <ProfileScreen v-else-if="currentTab === 'profile'" :current-user="currentUser" />
-        <NotificationsScreen 
-          v-else-if="currentTab === 'notifications'" 
-          :notifications="notificacoes" 
-          @back="goBack" 
-        />
-      </main>
-    </transition>
-    <nav class="bottom-navbar" :class="{ 'hidden': currentTab === 'notifications' }">
-      <button class="nav-btn" title="Início" @click="currentTab = 'home'">
-        <span class="nav-icon">
-          <IconComponent name="home" :size="24" />
-        </span>
-        <span class="nav-label">Início</span>
-      </button>
-      <button class="nav-btn" title="Buscar" @click="currentTab = 'search'">
-        <span class="nav-icon">
-          <IconComponent name="search" :size="24" />
-        </span>
-        <span class="nav-label">Buscar</span>
-      </button>
-      <button class="nav-btn publish" title="Publicar" @click="currentTab = 'publish'">
-        <span class="nav-icon">
-          <IconComponent name="publish" :size="24" />
-        </span>
-        <span class="nav-label">Publicar</span>
-      </button>
-      <button class="nav-btn" title="Mensagens" @click="currentTab = 'messages'">
-        <span class="nav-icon">
-          <IconComponent name="messages" :size="24" />
-        </span>
-        <span class="nav-label">Mensagem</span>
-      </button>
-      <button class="nav-btn" title="Perfil" @click="currentTab = 'profile'">
-        <span class="nav-icon">
-          <IconComponent name="profile" :size="24" />
-        </span>
-        <span class="nav-label">Perfil</span>
-      </button>
-    </nav>
+        </div>
+      </transition>
+    </main>
   </div>
 </template>
 
@@ -84,8 +27,7 @@ import PublishScreen from './PublishScreen.vue'
 import MessagesScreen from './MessagesScreen.vue'
 import ProfileScreen from './ProfileScreen.vue'
 import NotificationsScreen from './NotificationsScreen.vue'
-import IconComponent from './IconComponent.vue'
-import ThemeSelector from './ThemeSelector.vue'
+// import ThemeSelector removido
 
 export default {
   name: 'FeedPosts',
@@ -102,8 +44,7 @@ export default {
     MessagesScreen,
     ProfileScreen,
     NotificationsScreen,
-    IconComponent,
-    ThemeSelector
+    // ThemeSelector removido
   },
   data() {
     return {
@@ -121,9 +62,7 @@ export default {
           caption: 'Vista incrível!'
         }
       ],
-      notificacoesNaoLidas: 3, // Altere para testar
-      notificacaoUrgente: false, // true para badge vermelho
-      notificacaoPositiva: true, // true para badge verde
+      notificacoesNaoLidas: 3,
       notificacoes: [
         {
           id: 1,
@@ -174,111 +113,211 @@ export default {
 </script>
 
 <style scoped>
+/* Transições suaves */
 .fade-enter-active, .fade-leave-active {
-  transition: opacity 0.3s;
+  transition: opacity 0.3s ease;
 }
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
 }
+
+/* Container principal - layout moderno */
 .feed-container {
-  max-width: 400px;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: var(--background);
   min-height: 100vh;
   box-sizing: border-box;
   position: relative;
   color: var(--foreground);
+  display: flex;
+  flex-direction: column;
 }
+
+/* Header ultra minimalista */
 .feed-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0;
+}
+
+.header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-  background: var(--background);
-}
-
-.header-controls {
-  display: flex;
-  align-items: center;
-  gap: 15px;
+  padding: 16px 24px;
+  width: 100%; /* Ocupa toda a largura */
 }
 
 .logo {
-  font-family: 'Arial Black', Arial, sans-serif;
-  font-size: 1.5em;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 1.5rem;
   color: var(--primary);
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
-.notification-icon {
-  margin-left: auto;
-  cursor: pointer;
-  color: var(--primary);
-  transition: all 0.3s ease;
-  position: relative;
-  display: inline-flex;
+
+.header-actions {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 8px;
-  border-radius: 12px;
+  gap: 12px;
 }
-.notification-icon:hover {
-  color: var(--accent);
-  background: var(--background);
-  transform: scale(1.05);
-}
-.badge {
-  position: absolute;
-  top: -6px;
-  right: -10px;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  background: var(--accent);
-  color: #fff;
-  border-radius: 12px;
-  font-size: 0.85em;
-  font-weight: bold;
+
+/* Botão de notificação minimalista */
+.notification-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--foreground);
+  transition: all 0.2s ease;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--card);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-  z-index: 10;
-  transition: background 0.2s;
-}
-.badge.urgente {
-  background: #e74c3c; /* vermelho */
-}
-.badge.positiva {
-  background: var(--verde-energia); /* verde */
-}
-main {
-  padding: 16px 0;
-  padding-bottom: 70px; /* espaço para a navbar */
+  padding: 10px;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
 }
 
-main.no-navbar {
-  padding-bottom: 0; /* remove espaço quando navbar está escondida */
+.notification-btn:hover {
+  background: var(--border);
+  color: var(--primary);
 }
 
-/* Navbar inferior */
+.notification-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 16px;
+  height: 16px;
+  background: #ff3040;
+  color: white;
+  border-radius: 50%;
+  font-size: 0.65rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Layout principal com sidebar - ocupa toda a tela */
+.main-layout {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  min-height: calc(100vh - 70px);
+}
+
+/* Sidebar para desktop - largura fixa */
+.sidebar {
+  width: 280px;
+  min-height: calc(100vh - 70px);
+  background: var(--background);
+  border-right: 1px solid var(--border);
+  position: sticky;
+  top: 70px;
+  padding: 20px 0;
+  display: none; /* Oculto por padrão, mostra no desktop */
+  flex-shrink: 0;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 24px;
+}
+
+.sidebar-btn {
+  background: none;
+  border: none;
+  outline: none;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--foreground);
+  cursor: pointer;
+  padding: 12px 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 400;
+  width: 100%;
+  text-align: left;
+}
+
+.sidebar-btn:hover {
+  background: var(--border);
+}
+
+.sidebar-btn.active {
+  color: var(--primary);
+  background: rgba(0, 61, 124, 0.1);
+  font-weight: 600;
+}
+
+.sidebar-btn.publish {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.sidebar-btn.publish:hover {
+  background: rgba(0, 61, 124, 0.1);
+}
+
+.sidebar-label {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Conteúdo principal - ocupa toda a largura restante */
+.main-content {
+  flex: 1;
+  background: var(--background);
+  min-height: calc(100vh - 70px);
+  padding-bottom: 80px; /* Espaço para mobile navbar */
+  width: 100%;
+  max-width: none; /* Remove limitação de largura */
+}
+
+.main-content.no-navbar {
+  padding-bottom: 0;
+}
+
+.content-wrapper {
+  width: 100%;
+}
+
+/* Bottom navbar (apenas mobile) */
 .bottom-navbar {
   position: fixed;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100vw;
-  max-width: 400px;
-  margin: 0 auto;
-  background: var(--card);
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid var(--border);
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
-  height: 56px;
+  height: 65px;
   z-index: 100;
+  box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.1);
+  padding: 0 env(safe-area-inset-left) env(safe-area-inset-bottom) env(safe-area-inset-right);
 }
+
 .nav-btn {
   background: none;
   border: none;
@@ -286,58 +325,237 @@ main.no-navbar {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: var(--foreground);
+  justify-content: center;
+  color: #65676b;
   cursor: pointer;
   flex: 1;
-  padding: 8px 4px;
-  transition: all 0.3s ease;
-  border-radius: 12px;
+  max-width: 120px;
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+  border-radius: 8px;
   position: relative;
+  text-decoration: none;
 }
+
 .nav-btn:active, .nav-btn:focus {
-  background: var(--background);
+  background: var(--border);
 }
+
 .nav-btn:hover {
-  background: var(--background);
-  transform: translateY(-2px);
+  color: var(--primary);
 }
+
+.nav-btn.active {
+  color: var(--primary);
+}
+
 .nav-icon {
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 4px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
+
 .nav-label {
-  font-size: 0.75em;
+  font-size: 0.7rem;
   font-weight: 500;
-  letter-spacing: 0.5px;
+  text-align: center;
+  line-height: 1;
+  margin-top: 2px;
 }
+
 .publish {
   color: var(--primary);
-  font-weight: bold;
+}
+
+.publish .nav-icon {
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  padding: 8px;
+  margin-bottom: 4px;
+}
+
+.publish:hover .nav-icon {
+  background: var(--secondary);
+  transform: scale(1.05);
 }
 
 .bottom-navbar.hidden {
-  display: none;
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
 }
 
-/* Responsividade */
-@media (max-width: 500px) {
-  .feed-container {
-    max-width: 100vw;
-    border: none;
-    color: var(--foreground);
+/* Media queries responsivos e modernos */
+
+/* Mobile first - design limpo */
+@media (max-width: 767px) {
+  .header-content {
+    padding: 12px 16px;
   }
-  .feed-header {
-    padding: 10px 6px;
+
+  .logo {
+    font-size: 1.3rem;
   }
-  main {
-    padding: 8px 0;
-    padding-bottom: 70px;
+
+  .notification-btn {
+    width: 36px;
+    height: 36px;
+    padding: 8px;
   }
+
+  .main-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    display: none; /* Oculto no mobile */
+  }
+
+  .main-content {
+    border-left: none;
+    border-right: none;
+    max-width: 100%;
+    padding-bottom: 75px;
+  }
+
   .bottom-navbar {
-    max-width: 100vw;
+    height: 60px;
+    padding: 0 16px;
+    display: flex; /* Visível no mobile */
   }
+
+  .nav-btn {
+    padding: 6px 8px;
+    max-width: 100px;
+  }
+
+  .nav-label {
+    font-size: 0.65rem;
+  }
+}
+
+/* Landscape mobile - mais sutil */
+@media (max-width: 767px) and (orientation: landscape) {
+  .feed-header {
+    padding: 0;
+  }
+
+  .header-content {
+    padding: 8px 16px;
+  }
+
+  .bottom-navbar {
+    height: 50px;
+  }
+
+  .nav-label {
+    display: none;
+  }
+
+  .nav-btn {
+    padding: 4px;
+  }
+
+  .main-content {
+    padding-bottom: 60px;
+  }
+}
+
+/* Tablet - transição para desktop */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .main-content {
+    padding: 10px 20px;
+  }
+
+  .sidebar {
+    display: none; /* Ainda oculto no tablet */
+  }
+
+  .bottom-navbar {
+    display: flex;
+  }
+}
+
+/* Desktop - experiência completa com sidebar */
+@media (min-width: 1024px) {
+  .sidebar {
+    display: block; /* Visível no desktop */
+  }
+
+  .main-content {
+    padding-bottom: 20px; /* Remove espaço do bottom navbar */
+    padding: 20px 40px; /* Adiciona padding interno */
+  }
+
+  .bottom-navbar {
+    display: none; /* Oculto no desktop */
+  }
+
+  .header-content {
+    padding: 16px 24px;
+  }
+
+  .feed-header {
+    border-left: none;
+    border-right: none;
+  }
+}
+
+/* Large desktop - layout expandido para tela inteira */
+@media (min-width: 1400px) {
+  .sidebar {
+    width: 320px;
+  }
+
+  .sidebar-nav {
+    padding: 0 32px;
+  }
+
+  .sidebar-btn {
+    padding: 16px 20px;
+    font-size: 1.1rem;
+  }
+
+  .main-content {
+    padding: 20px 60px; /* Mais padding para telas grandes */
+  }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .feed-header {
+    background: rgba(24, 25, 26, 0.85);
+  }
+  
+  .bottom-navbar {
+    background: rgba(24, 25, 26, 0.9);
+  }
+
+  .sidebar {
+    background: var(--background);
+  }
+}
+
+/* Animações e transições especiais */
+.sidebar-btn,
+.nav-btn {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.main-content {
+  transition: padding-bottom 0.3s ease;
+}
+
+/* Estados de hover mais elegantes */
+.sidebar-btn:hover,
+.nav-btn:hover {
+  transform: translateY(-1px);
+}
+
+.notification-btn:hover {
+  transform: scale(1.05);
 }
 </style>

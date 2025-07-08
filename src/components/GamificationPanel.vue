@@ -568,42 +568,259 @@ export default {
   font-weight: 600;
 }
 
-/* Responsivo */
+/* Responsividade Avançada */
+@media (max-width: 1024px) {
+  .gamification-modal {
+    max-width: 90%;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+  
+  .badges-grid {
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .stat-card {
+    padding: 16px;
+  }
+  
+  .stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .stat-label {
+    font-size: 12px;
   }
   
   .badges-grid {
     grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  
+  .badge-item {
+    padding: 12px;
+  }
+  
+  .badge-icon {
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+  }
+  
+  .badge-name {
+    font-size: 11px;
+  }
+  
+  .badge-description {
+    font-size: 10px;
   }
   
   .game-header {
     flex-direction: column;
+    align-items: center;
     gap: 15px;
-    align-items: stretch;
+    text-align: center;
+  }
+  
+  .level-info {
+    align-items: center;
+  }
+  
+  .ranking-list {
+    max-height: 250px;
+  }
+  
+  .ranking-item {
+    padding: 12px;
+    font-size: 14px;
+  }
+  
+  .position {
+    min-width: 24px;
+    font-size: 14px;
+  }
+  
+  .username {
+    font-size: 14px;
+  }
+  
+  .points {
+    font-size: 12px;
+  }
+  
+  .level {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+  
+  .achievements-content {
+    padding: 16px;
+  }
+  
+  .progress-bar {
+    height: 6px;
   }
   
   .modal-content {
     width: 95%;
-    margin: 10px;
+    margin: 16px;
+    max-height: calc(100vh - 32px);
+  }
+  
+  .modal-header {
+    padding: 16px;
+  }
+  
+  .modal-title {
+    font-size: 1.3rem;
+  }
+  
+  .close-modal-btn {
+    width: 32px;
+    height: 32px;
   }
 }
 
 @media (max-width: 480px) {
   .stats-grid {
     grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .stat-card {
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+  }
+  
+  .stat-value {
+    font-size: 1.8rem;
+    margin-bottom: 0;
+  }
+  
+  .stat-label {
+    font-size: 13px;
+    text-transform: none;
+    letter-spacing: normal;
+  }
+  
+  .badges-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .badge-item {
+    padding: 16px 12px;
+  }
+  
+  .badge-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+  }
+  
+  .badge-name {
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  .badge-description {
+    font-size: 11px;
+    margin-top: 4px;
   }
   
   .ranking-item {
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
+    padding: 16px 12px;
+  }
+  
+  .position {
+    order: 1;
+    min-width: 30px;
+  }
+  
+  .username {
+    order: 2;
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .level {
+    order: 3;
+  }
+  
+  .points {
+    order: 4;
+    width: 100%;
+    text-align: left;
+    margin-top: 4px;
   }
   
   .level-info {
     flex-direction: column;
     text-align: center;
-    gap: 10px;
+    gap: 12px;
+  }
+  
+  .level-display {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .level-number {
+    font-size: 2rem;
+  }
+  
+  .level-name {
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  
+  .xp-info {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .xp-text {
+    font-size: 13px;
+  }
+  
+  .achievements-content {
+    padding: 12px;
+  }
+  
+  .section-title {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+  }
+  
+  .progress-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .progress-text {
+    font-size: 13px;
+  }
+  
+  .progress-percentage {
+    font-size: 12px;
+  }
+  
+  .modal-content {
+    margin: 8px;
+    border-radius: 12px;
   }
 }
 </style>

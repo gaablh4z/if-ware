@@ -218,13 +218,6 @@ export const adminConfig = {
   version: '1.0.0',
   itemsPerPage: 20,
   maxItemsPerPage: 100,
-  dateFormat: 'DD/MM/YYYY HH:mm',
-  theme: {
-    primary: '#007bff',
-    secondary: '#6c757d',
-    success: '#28a745',
-    danger: '#dc3545',
-    warning: '#ffc107',
-    info: '#17a2b8'
-  }
+  dateFormat: 'DD/MM/YYYY HH:mm'
+  // theme removido
 }

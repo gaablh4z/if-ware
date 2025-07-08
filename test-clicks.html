@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Cliques da Navbar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        
+        .test-button {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-radius: 8px;
+            margin: 5px 0;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+        }
+        
+        .test-button:hover {
+            background: #e0e0e0;
+        }
+        
+        .test-button.active {
+            background: #007bff;
+            color: white;
+        }
+        
+        .logs {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            background: white;
+            border-radius: 4px;
+            border-left: 3px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Teste de Cliques da Navbar IF Wave</h1>
+    <p>Este teste simula os botões da navbar para verificar se os eventos de clique funcionam corretamente.</p>
+    
+    <div id="test-buttons">
+        <div class="test-button" onclick="testClick('login')">
+            🔒 Login
+        </div>
+        
+        <div class="test-button" onclick="testClick('register')">
+            ✏️ Cadastrar
+        </div>
+        
+        <div class="test-button" onclick="testClick('home')">
+            🏠 Início
+        </div>
+        
+        <div class="test-button" onclick="testClick('search')">
+            🔍 Buscar
+        </div>
+        
+        <div class="test-button" onclick="testClick('publish')">
+            📷 Publicar
+        </div>
+        
+        <div class="test-button" onclick="testClick('messages')">
+            💬 Mensagens
+        </div>
+        
+        <div class="test-button" onclick="testClick('notifications')">
+            🔔 Notificações
+        </div>
+        
+        <div class="test-button" onclick="testClick('profile')">
+            👤 Perfil
+        </div>
+        
+        <div class="test-button" onclick="testClick('settings')">
+            ⚙️ Admin
+        </div>
+        
+        <div class="test-button" onclick="testClick('logout')">
+            🚪 Sair
+        </div>
+    </div>
+    
+    <div class="logs">
+        <h3>Logs de Teste:</h3>
+        <div id="log-container"></div>
+        <button onclick="clearLogs()" style="margin-top: 10px; padding: 5px 10px;">Limpar Logs</button>
+    </div>
+    
+    <script>
+        let currentScreen = 'login';
+        let currentUser = null;
+        
+        function addLog(message) {
+            const logContainer = document.getElementById('log-container');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        function clearLogs() {
+            document.getElementById('log-container').innerHTML = '';
+        }
+        
+        function updateActiveButton() {
+            const buttons = document.querySelectorAll('.test-button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Simular estado ativo baseado na tela atual
+            // Para simplificar, apenas destacamos o último clicado
+        }
+        
+        function testClick(screen) {
+            addLog(`Botão "${screen}" clicado`);
+            
+            if (screen === 'login') {
+                currentUser = null;
+                currentScreen = 'login';
+                addLog('Navegando para tela de login');
+            } else if (screen === 'register') {
+                currentUser = null;
+                currentScreen = 'register';
+                addLog('Navegando para tela de cadastro');
+            } else if (screen === 'logout') {
+                currentUser = null;
+                currentScreen = 'login';
+                addLog('Usuário deslogado, redirecionando para login');
+            } else if (['home', 'search', 'publish', 'messages', 'notifications', 'profile', 'settings'].includes(screen)) {
+                if (!currentUser) {
+                    // Simular login automático para teste
+                    currentUser = {
+                        name: 'Usuário Teste',
+                        email: 'teste@ifmt.edu.br',
+                        role: 'student'
+                    };
+                    addLog('Usuário logado automaticamente para teste');
+                }
+                currentScreen = screen;
+                addLog(`Navegando para tela: ${screen}`);
+            }
+            
+            addLog(`Estado atual - Screen: ${currentScreen}, User: ${currentUser ? currentUser.name : 'não logado'}`);
+            
+            // Atualizar botão ativo
+            event.target.classList.add('active');
+            setTimeout(() => {
+                event.target.classList.remove('active');
+            }, 1000);
+        }
+        
+        // Log inicial
+        addLog('Teste iniciado - Tela atual: login');
+        addLog('Clique nos botões acima para testar a navegação');
+    </script>
+</body>
+</html>

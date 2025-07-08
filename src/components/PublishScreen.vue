@@ -728,28 +728,140 @@ export default {
   border: 1px solid #feb2b2;
 }
 
+/* Responsividade Avançada */
+@media (max-width: 1024px) {
+  .publish-container {
+    max-width: 100%;
+    padding: clamp(16px, 4vw, 24px);
+  }
+}
+
 @media (max-width: 768px) {
   .publish-container {
-    padding: 15px;
+    padding: 12px;
+  }
+  
+  .publish-header h2 {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+  }
+  
+  .content-type-selector {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .type-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+  }
+  
+  .post-textarea {
+    min-height: 120px;
+    font-size: 16px; /* Evita zoom no iOS */
   }
   
   .form-actions {
     flex-direction: column;
+    gap: 12px;
   }
   
   .btn {
     width: 100%;
+    padding: 14px;
+    font-size: 16px;
   }
   
   .draft-item {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 12px;
+    padding: 16px;
   }
   
   .draft-actions {
     width: 100%;
     justify-content: flex-end;
+    gap: 8px;
+  }
+  
+  .btn-small {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  
+  .preview-card {
+    margin: 0 -12px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+  
+  .image-preview {
+    max-width: 100%;
+  }
+  
+  .preview-img {
+    max-width: 100%;
+    max-height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .publish-container {
+    padding: 8px;
+  }
+  
+  .publish-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .publish-header h2 {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+  
+  .publish-header p {
+    font-size: 14px;
+  }
+  
+  .content-type-selector {
+    margin-bottom: 20px;
+  }
+  
+  .type-btn {
+    padding: 14px;
+    font-size: 15px;
+  }
+  
+  .post-textarea {
+    font-size: 16px;
+    padding: 14px;
+  }
+  
+  .category-select {
+    font-size: 16px;
+    padding: 12px;
+  }
+  
+  .upload-btn {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  
+  .char-count {
+    font-size: 13px;
+  }
+  
+  .draft-content p {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  
+  .draft-content small {
+    font-size: 12px;
   }
 }
 </style>

@@ -400,17 +400,7 @@
         <div class="modal-content">
           <div class="setting-section">
             <h4 class="section-title">Aparência</h4>
-            <div class="setting-item">
-              <div class="setting-info">
-                <h4>Tema</h4>
-                <p>Escolha entre tema claro, escuro ou automático</p>
-              </div>
-              <select v-model="appSettings.theme" class="setting-select">
-                <option value="auto">Automático</option>
-                <option value="light">Claro</option>
-                <option value="dark">Escuro</option>
-              </select>
-            </div>
+            <!-- Seção de tema removida -->
             
             <div class="setting-item">
               <div class="setting-info">
@@ -592,7 +582,7 @@ export default {
       
       // Configurações do app
       appSettings: {
-        theme: 'auto',
+        // theme removido
         fontSize: 'medium',
         pushNotifications: true,
         soundNotifications: true,
@@ -1202,7 +1192,7 @@ export default {
 
       // Atualizar configurações no localStorage
       const appSettings = {
-        theme: this.appSettings.theme,
+        // theme removido
         fontSize: this.appSettings.fontSize,
         pushNotifications: this.appSettings.pushNotifications,
         soundNotifications: this.appSettings.soundNotifications,
